@@ -38,9 +38,10 @@ class ball:
     def setVeloVector(self, vector, angle):
         x = vector * math.cos(math.radians(angle))
         y = vector * math.sin(math.radians(angle))
-        self.setVelo((x, -y))
+        self.setVelo((x, y))
 
     def runVelo(self): 
+        #TODO: problem with friction, it needs to effect the x comp and y comp equally, not individually. the friction isnt equal
         frictionX = -sign(self.velo[0]) * self.friction
         frictionY = -sign(self.velo[1]) * self.friction
 

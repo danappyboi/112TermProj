@@ -18,8 +18,12 @@ def onAppStart(app):
                    app.width/2- app.tableWidth/2, app.height/2]
     app.angle = 180
 
+    #TODO: fix whatever tf happens here
+    # app.redBall = ball(0, 0 + 200, "red", velo=(0,0))
+    # app.cueBall = ball(8,0 - 100, "white", velo=(0, 10))
+
     app.redBall = ball(0, 0 + 200, "red", velo=(0,0))
-    app.cueBall = ball(12,0 - 100, "white", velo=(0, 8))
+    app.cueBall = ball(8,0 - 100, "white", velo=(0, 8))
 
     app.ballList = [app.cueBall, app.redBall]
 
@@ -76,18 +80,20 @@ def checkBallCollisions(app):
 
                 dx = abs(ball1.posX-ball2.posX)
                 dy = abs(ball1.posY-ball2.posY)
-                angle = math.atan2(dy,dx)
+                angle = math.degrees(math.atan2(dy,dx))
+
+                print(dx, dy, angle)
 
                 # #Weird vid code
                 # ###
                 # ball1.velo = rotateAlgo(ball1.velo, angle)
                 # ball2.velo = rotateAlgo(ball2.velo, angle)
 
-                # if distanceBetweenBalls < (ball1.r + ball2.r):
-                #     if ball1.velo[0] != 0:
-                #         ball1.posX += (ball1.velo[0]/abs(ball1.velo[0])) * distanceBetweenBalls/2
-                #     if ball2.velo[0] != 0:
-                #         ball2.posX += (ball2.velo[0]/abs(ball2.velo[0])) * distanceBetweenBalls/2
+                if distanceBetweenBalls < (ball1.r + ball2.r):
+                    if ball1.velo[0] != 0:
+                        ball1.posX += (ball1.velo[0]/abs(ball1.velo[0])) * distanceBetweenBalls/2
+                    if ball2.velo[0] != 0:
+                        ball2.posX += (ball2.velo[0]/abs(ball2.velo[0])) * distanceBetweenBalls/2
 
                 # tempVelo = ball1.velo
                 # ball1.setVelo(ball2.velo)
@@ -98,15 +104,10 @@ def checkBallCollisions(app):
                 # ###
 
                 # this is my code, most of it is probably dogshit
+                
                 ogVector = ball1.getVeloVector()
-                ogAngle = ball1.getVeloAngle()
-                # angleDiff = math.degrees(math.atan2((ball2.velo[1] - ball1.velo[1]),(ball2.velo[0] - ball1.velo[0])))
                 ball1.setVeloVector(ogVector * math.sin(90-angle), 180-(90 + angle))
-                ball2.setVeloVector(ogVector * math.cos(90-angle) + ball2.getVeloVector(), 90 + angle)
-
-                # print(f"ogVector: {ogVector}")
-                # print(f"ogAngle: {ogAngle}")
-                # print(f"angleDiff: {angleDiff}\n")
+                ball2.setVeloVector(ogVector * math.cos(90-angle) + ball2.getVeloVector(), 180-angle)
 
 
 
