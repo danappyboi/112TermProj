@@ -1,10 +1,12 @@
 from cmu_graphics import *
 import math
 from ballObj import ball
+from matrixOps import rotateAlgo, revertAlgo
+import pointConvert
 
 def onAppStart(app):
     app.background = "black"
-    app.width = 400
+    app.width = 600
     app.height = 600
     app.tableWidth = 250
     app.tableHeight = 500
@@ -21,30 +23,16 @@ def onAppStart(app):
     app.tick = 1
     app.runStep = False
 
+    # app.redBall = ball(app.width/2 + 100, app.height/2 + 100, "red", velo=(-3, -3))
+    # app.cueBall = ball(app.width/2 - 100, app.height/2 - 100, "white", velo=(3,3))
+
+    # app.ballList = [app.cueBall, app.redBall]
+
     app.redBall = ball(app.width/2, app.height/2 - 200, "red", velo=(0,0))
-    app.blueBall = ball(app.width/2 - 18, app.height/2 - 200, "blue", velo=(0,0))
-    app.greenBall = ball(app.width/2 - 18 * 2, app.height/2 - 200, "lime", velo=(0,0))
-    app.orangeBall = ball(app.width/2 - 18 * 3, app.height/2 - 200, "orange", velo=(0,0))
-    app.yellowBall = ball(app.width/2 + 18, app.height/2 -200, "yellow", velo=(0,0))
-    app.blackBall = ball(app.width/2 + 18 * 2, app.height/2 -200, "black", velo=(0,0))
-    app.purpleBall = ball(app.width/2 - 18 * 1.5, app.height/2 - 200 + 18, "purple", velo=(0,0))
-    app.pinkBall = ball(app.width/2 - 18 * 0.5, app.height/2 - 200 + 18, "pink", velo=(0,0))
-    app.grayBall = ball(app.width/2 + 18 * 1.5, app.height/2 - 200 + 18, "gray", velo=(0,0))
-    app.lightBall = ball(app.width/2 + 18 * .5, app.height/2 - 200 + 18, "lightBlue", velo=(0,0))
 
-    app.ball1 = ball(app.width/2 + 18, app.height/2 - 200 + 18 * 2, 'mediumVioletRed', velo=(0,0))
-    app.ball2 = ball(app.width/2 - 18, app.height/2 - 200 + 18 * 2, 'brown', velo=(0,0))
-    app.ball3 = ball(app.width/2, app.height/2 - 200 + 18 * 2, 'darkSlateGray', velo=(0,0))
-    app.ball4 = ball(app.width/2 - 18 * .5, app.height/2 - 200 + 18 * 3, 'fireBrick', velo=(0,0))
-    app.ball5 = ball(app.width/2 + 18 * .5, app.height/2 - 200 + 18 * 3, 'gold', velo=(0,0))
-    app.ball6 = ball(app.width/2, app.height/2 - 200 + 18 * 4, 'darkTurquoise', velo=(0,0))
+    app.cueBall = ball(app.width/2 +12, app.height/2 + 100, "white", velo=(0,-8))
 
-    app.cueBall = ball(app.width/2, app.height/2 + 100, "white", velo=(0,0))
-
-    app.ballList = [app.cueBall, app.redBall, app.blueBall, app.greenBall, 
-                    app.yellowBall, app.blackBall, app.purpleBall, app.pinkBall, 
-                    app.grayBall, app.lightBall, app.ball1, app.ball2,
-                    app.ball3, app.ball4, app.ball5, app.ball6]
+    app.ballList = [app.cueBall, app.redBall]
 
 
 def drawStick(posX, posY, angle, distFromBall):
@@ -67,26 +55,68 @@ def checkBallCollisions(app):
         for j in range(i, len(app.ballList)):
             if i == j:
                 continue
+            
             ball1 = app.ballList[i]
             ball2 = app.ballList[j]
 
-            if distance(ball1.posX, ball1.posY, ball2.posX, ball2.posY) <= (ball1.r + ball2.r):
+            dx = abs(ball1.posX-ball2.posX)
+            dy = abs(ball1.posY-ball2.posY)
+            angle = math.atan2(dy,dx)
+
+            # if ball1.getVeloAngle() - angle > ball2.getVeloAngle() - angle:
+            #     ball1, ball2 = ball2, ball1
+            
+
+            distanceBetweenBalls = distance(ball1.posX, ball1.posY, ball2.posX, ball2.posY) 
+            if distanceBetweenBalls <= (ball1.r + ball2.r):
                 # print("titties")
 
-                if distance(ball1.posX, ball1.posY, ball2.posX, ball2.posY) < (ball1.r + ball2.r):
-                    ball1.posX -= 20
-                    ball1.posY -= 20
+                # # putting them back
+                if distanceBetweenBalls < (ball1.r + ball2.r):
+                    if ball1.velo[0] > 0:
+                        ball1.posX += (distanceBetweenBalls - (ball1.r + ball2.r))
+                    else:
+                        ball1.posX -= (distanceBetweenBalls - (ball1.r + ball2.r)) 
+
+                    if ball1.velo[1] > 0:
+                        ball1.posY += (distanceBetweenBalls - (ball1.r + ball2.r))
+                    else:
+                        ball1.posY -= (distanceBetweenBalls - (ball1.r + ball2.r))
                     print("HERE!!")
 
+                dx = abs(ball1.posX-ball2.posX)
+                dy = abs(ball1.posY-ball2.posY)
+                angle = math.atan2(dy,dx)
+
+                # #Weird vid code
+                # ###
+                # ball1.velo = rotateAlgo(ball1.velo, angle)
+                # ball2.velo = rotateAlgo(ball2.velo, angle)
+
+                # if distanceBetweenBalls < (ball1.r + ball2.r):
+                #     if ball1.velo[0] != 0:
+                #         ball1.posX += (ball1.velo[0]/abs(ball1.velo[0])) * distanceBetweenBalls/2
+                #     if ball2.velo[0] != 0:
+                #         ball2.posX += (ball2.velo[0]/abs(ball2.velo[0])) * distanceBetweenBalls/2
+
+                # tempVelo = ball1.velo
+                # ball1.setVelo(ball2.velo)
+                # ball2.setVelo(tempVelo)
+
+                # ball1.velo = revertAlgo(ball1.velo, angle)
+                # ball2.velo = revertAlgo(ball2.velo, angle)
+                # ###
+
+                # this is my code, most of it is probably dogshit
                 ogVector = ball1.getVeloVector()
                 ogAngle = ball1.getVeloAngle()
-                angleDiff = math.degrees(math.atan2((ball2.velo[1] - ball1.velo[1]),(ball2.velo[0] - ball1.velo[0])))
-                ball1.setVeloVector(ogVector * math.sin(ogAngle), angleDiff + ogAngle)
-                ball2.setVeloVector(ogVector * math.cos(ogAngle), angleDiff + ogAngle)
+                # angleDiff = math.degrees(math.atan2((ball2.velo[1] - ball1.velo[1]),(ball2.velo[0] - ball1.velo[0])))
+                ball1.setVeloVector(ogVector * math.sin(90-angle), 180-(90 + angle))
+                ball2.setVeloVector(ogVector * math.cos(90-angle) + ball2.getVeloVector(), 90 + angle)
 
-                print(f"ogVector: {ogVector}")
-                print(f"ogAngle: {ogAngle}")
-                print(f"angleDiff: {angleDiff}\n")
+                # print(f"ogVector: {ogVector}")
+                # print(f"ogAngle: {ogAngle}")
+                # print(f"angleDiff: {angleDiff}\n")
 
 
 
@@ -99,29 +129,41 @@ def redrawAll(app):
     # drawing the ball
     for ball in app.ballList:
         ball.draw()
-
-    drawStick(app.cueBall.posX, app.cueBall.posY, app.angle, 40)
-
-
-
-
-def onMouseMove(app, mouseX, mouseY):
-    posX = app.width/2
-    posY = app.height/2
-    app.angle = math.degrees(math.atan2(mouseY - posY, mouseX - posX)) - 90
     
-# def onKeyPress(app, key):
-#     if key == "up":
-#         app.cueBall.posY -= 5
-#     if key == "down":
-#         app.cueBall.posY += 5
-#     if key == "left":
-#         app.cueBall.posX -= 5
-#     if key == "right":
-#         app.cueBall.posX += 5
-#     if key == "s":
-#         takeStep(app)
+    testingNotes(app, app.ballList)
+
+def testingNotes(app, ballList):
+    spacing = 100
+    gap = 15
+    for i in range(len(ballList)):
+        ball = ballList[i]
+        veloStat = (math.ceil(ball.velo[0]*1000)/1000, math.ceil(ball.velo[1]*1000)/1000) 
+        xStat = math.ceil(ball.posX*1000)/1000
+        yStat = math.ceil(ball.posY*1000)/1000
+        drawLabel(f"{ball.color}", 50, i * spacing + 50, fill="white", size=10)
+        drawLabel(veloStat, 50, i * spacing + 50 + gap, fill="white", size=10)
+        drawLabel(f"Pos: {xStat}, {yStat}", 50, i * spacing + 50 + gap*2, fill="white", size=10)
+
+
+
+# def onMouseMove(app, mouseX, mouseY):
+#     # posX = app.width/2
+#     # posY = app.height/2
+#     # app.angle = math.degrees(math.atan2(mouseY - posY, mouseX - posX)) - 90
 #     pass
+
+# def onKeyPress(app, key):
+    # if key == "up":
+    #     app.cueBall.posY -= 5
+    # if key == "down":
+    #     app.cueBall.posY += 5
+    # if key == "left":
+    #     app.cueBall.posX -= 5
+    # if key == "right":
+    #     app.cueBall.posX += 5
+    # if key == "s":
+    #     takeStep(app)
+    # pass
 
 # def onKeyHold(app, keys):
 #     # if "up" in keys:
@@ -139,7 +181,7 @@ def onMouseMove(app, mouseX, mouseY):
     
 #     # pass
 def onStep(app):
-    app.tick +=1
+    checkBallCollisions(app)
     
 
 def main():
