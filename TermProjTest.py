@@ -23,7 +23,7 @@ def onAppStart(app):
     # app.cueBall = ball(8,0 - 100, "white", velo=(0, 10))
 
     app.redBall = ball(0, 0 + 200, "red", velo=(0,0))
-    app.cueBall = ball(8,0 - 100, "white", velo=(0, 8))
+    app.cueBall = ball(8,0 - 100, "white", velo=(0, 9))
 
     app.ballList = [app.cueBall, app.redBall]
 
@@ -52,20 +52,13 @@ def checkBallCollisions(app):
             
             ball1 = app.ballList[i]
             ball2 = app.ballList[j]
-
-            dx = abs(ball1.posX-ball2.posX)
-            dy = abs(ball1.posY-ball2.posY)
-            angle = math.atan2(dy,dx)
-
-            # if ball1.getVeloAngle() - angle > ball2.getVeloAngle() - angle:
-            #     ball1, ball2 = ball2, ball1
-            
+           
 
             distanceBetweenBalls = distance(ball1.posX, ball1.posY, ball2.posX, ball2.posY) 
             if distanceBetweenBalls <= (ball1.r + ball2.r):
                 # print("titties")
 
-                # # putting them back
+                # putting them back
                 if distanceBetweenBalls < (ball1.r + ball2.r):
                     if ball1.velo[0] > 0:
                         ball1.posX += (distanceBetweenBalls - (ball1.r + ball2.r))
@@ -78,30 +71,20 @@ def checkBallCollisions(app):
                         ball1.posY -= (distanceBetweenBalls - (ball1.r + ball2.r))
                     print("HERE!!")
 
+                # if distanceBetweenBalls < (ball1.r + ball2.r):
+                #     if ball1.velo[0] != 0:
+                #         ball1.posX += (ball1.velo[0]/abs(ball1.velo[0])) * distanceBetweenBalls/2
+                #     if ball2.velo[0] != 0:
+                #         ball2.posX += (ball2.velo[0]/abs(ball2.velo[0])) * distanceBetweenBalls/2
+
                 dx = abs(ball1.posX-ball2.posX)
                 dy = abs(ball1.posY-ball2.posY)
                 angle = math.degrees(math.atan2(dy,dx))
+                print(angle)
+                
 
-                print(dx, dy, angle)
-
-                # #Weird vid code
-                # ###
-                # ball1.velo = rotateAlgo(ball1.velo, angle)
-                # ball2.velo = rotateAlgo(ball2.velo, angle)
-
-                if distanceBetweenBalls < (ball1.r + ball2.r):
-                    if ball1.velo[0] != 0:
-                        ball1.posX += (ball1.velo[0]/abs(ball1.velo[0])) * distanceBetweenBalls/2
-                    if ball2.velo[0] != 0:
-                        ball2.posX += (ball2.velo[0]/abs(ball2.velo[0])) * distanceBetweenBalls/2
-
-                # tempVelo = ball1.velo
-                # ball1.setVelo(ball2.velo)
-                # ball2.setVelo(tempVelo)
-
-                # ball1.velo = revertAlgo(ball1.velo, angle)
-                # ball2.velo = revertAlgo(ball2.velo, angle)
-                # ###
+                # if ball1.getVeloAngle() - angle > ball2.getVeloAngle() - angle:
+                #     ball1, ball2 = ball2, ball1
 
                 # this is my code, most of it is probably dogshit
                 

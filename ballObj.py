@@ -14,7 +14,7 @@ class ball:
         self.color = color
         self.velo = velo
         self.r = r
-        self.friction = .07
+        self.friction = .98
 
     def setVelo(self, velo):
         self.velo = velo
@@ -41,15 +41,12 @@ class ball:
         self.setVelo((x, y))
 
     def runVelo(self): 
-        #TODO: problem with friction, it needs to effect the x comp and y comp equally, not individually. the friction isnt equal
-        frictionX = -sign(self.velo[0]) * self.friction
-        frictionY = -sign(self.velo[1]) * self.friction
 
-        newVeloX = self.velo[0] + frictionX
-        newVeloY = self.velo[1] + frictionY
-        if abs(self.velo[0] + frictionX) <= 0.05:
+        newVeloX = self.velo[0] * self.friction
+        newVeloY = self.velo[1] * self.friction
+        if abs(self.velo[0]) <= 0.1:
             newVeloX = 0
-        if abs(self.velo[1] + frictionY) <= 0.05:
+        if abs(self.velo[1]) <= 0.1:
             newVeloY = 0
         self.setVelo((newVeloX, newVeloY))
         self.posX += self.velo[0]
