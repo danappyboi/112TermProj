@@ -17,24 +17,14 @@ def onAppStart(app):
                    app.width/2 - app.tableWidth/2, app.height/2 + app.tableHeight/2,
                    app.width/2- app.tableWidth/2, app.height/2]
     app.angle = 180
-    # app.stepsPerSecond = 10
 
-    app.oldtick = 0
-    app.tick = 1
-    app.runStep = False
-
-    # app.redBall = ball(app.width/2 + 100, app.height/2 + 100, "red", velo=(-3, -3))
-    # app.cueBall = ball(app.width/2 - 100, app.height/2 - 100, "white", velo=(3,3))
-
-    # app.ballList = [app.cueBall, app.redBall]
-
-    app.redBall = ball(app.width/2, app.height/2 - 200, "red", velo=(0,0))
-
-    app.cueBall = ball(app.width/2 +12, app.height/2 + 100, "white", velo=(0,-8))
+    app.redBall = ball(0, 0 + 200, "red", velo=(0,0))
+    app.cueBall = ball(12,0 - 100, "white", velo=(0, 8))
 
     app.ballList = [app.cueBall, app.redBall]
 
 
+#TODO: because im chaning position, this is also probably fucked up, gotta fixxx
 def drawStick(posX, posY, angle, distFromBall):
     mathAngle = angle + 270
     stickSize = 300
@@ -176,10 +166,6 @@ def testingNotes(app, ballList):
 #     #     app.cueBall.posX += 5
 #     pass
 
-# def takeStep(app):
-#     checkBallCollisions(app)
-    
-#     # pass
 def onStep(app):
     checkBallCollisions(app)
     

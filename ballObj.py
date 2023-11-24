@@ -64,26 +64,30 @@ class ball:
         self.runVelo()
         x = pointConvert.cartToPyX(self.posX)
         y = pointConvert.cartToPyY(self.posY)
-        drawCircle(self.posX, self.posY, self.r, fill=self.color)
+        drawCircle(x, y, self.r, fill=self.color)
         arrowMag = 8
-        drawLine(self.posX, self.posY, self.posX + self.velo[0]* arrowMag, self.posY + self.velo[1]* arrowMag, lineWidth = 3, arrowEnd=True, fill=self.color)
+        drawLine(x, y, x + self.velo[0]* arrowMag, y - self.velo[1]* arrowMag, lineWidth = 3, arrowEnd=True, fill=self.color)
 
 
     def wallCollisionX(self):
-        if not ((width-tableWidth)/2 <= self.posX - self.r):
-            self.posX = (width-tableWidth)/2 + self.r
+        x = pointConvert.cartToPyX(self.posX)
+
+        if not ((width-tableWidth)/2 <= x - self.r):
+            x = (width-tableWidth)/2 + self.r
             return True
-        elif not (self.posX + self.r<= (width-tableWidth)/2 + tableWidth):
-            self.posX = (width-tableWidth)/2 + tableWidth - self.r
+        elif not (x + self.r<= (width-tableWidth)/2 + tableWidth):
+            x = (width-tableWidth)/2 + tableWidth - self.r
             return True
         return False
 
     def wallCollisionY(self):
-        if not ((height-tableHeight)/2 <= self.posY - self.r):
-            self.posY = (height-tableHeight)/2 + self.r
+        y = pointConvert.cartToPyY(self.posY)
+
+        if not ((height-tableHeight)/2 <= y - self.r):
+            y = (height-tableHeight)/2 + self.r
             return True
-        elif not (self.posY + self.r <= (height-tableHeight)/2 + tableHeight):
-            self.posY = (height-tableHeight)/2 + tableHeight - self.r
+        elif not (y + self.r <= (height-tableHeight)/2 + tableHeight):
+            y = (height-tableHeight)/2 + tableHeight - self.r
             return True
         return False
     
