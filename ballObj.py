@@ -65,8 +65,8 @@ class ball:
         drawCircle(x+1, y+1, self.r +1, fill=rgb(30, 30, 30), opacity=30)
         drawCircle(x, y, self.r, fill=self.color)
         drawCircle(x - 3, y - 3, 2, fill="white", opacity=70)
-        arrowMag = 8
-        drawLine(x, y, x + self.velo[0]* arrowMag, y - self.velo[1]* arrowMag, lineWidth = 3, arrowEnd=True, fill=self.color)
+        # arrowMag = 8
+        # drawLine(x, y, x + self.velo[0]* arrowMag, y - self.velo[1]* arrowMag, lineWidth = 3, arrowEnd=True, fill=self.color)
 
 
     def wallCollisionX(self):
