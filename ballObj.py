@@ -1,5 +1,11 @@
 from cmu_graphics import*
+import pointConvert
 import math
+
+width = 600
+height = 600
+tableWidth = 250
+tableHeight = 500
 
 class ball:
     def __init__(self, posX, posY, color, velo=(0,0), r=8):
@@ -8,6 +14,7 @@ class ball:
         self.color = color
         self.velo = velo
         self.r = r
+        self.friction = .98
 
     def setVelo(self, velo):
         self.velo = velo
@@ -16,41 +23,76 @@ class ball:
         return math.sqrt(self.velo[0]**2 + self.velo[1]**2)
     
     def getVeloAngle(self):
-        return math.degrees(math.atan2(self.velo[1],self.velo[0]))
+        angle = abs(math.degrees(math.atan2(self.velo[1],self.velo[0])))
+        if self.velo[0] >= 0 and self.velo[1] >= 0:
+            return angle
+        elif self.velo[0] >= 0 and self.velo[1] < 0:
+            return -angle
+        elif self.velo[0] < 0 and self.velo[1] >= 0:
+            return 90 + angle
+        else:
+            return -(90 + angle)
+
+
     
     def setVeloVector(self, vector, angle):
         x = vector * math.cos(math.radians(angle))
         y = vector * math.sin(math.radians(angle))
         self.setVelo((x, y))
 
-    def runVelo(self):  
+    def runVelo(self): 
+
+        newVeloX = self.velo[0] * self.friction
+        newVeloY = self.velo[1] * self.friction
+        if abs(self.velo[0]) <= 0.1:
+            newVeloX = 0
+        if abs(self.velo[1]) <= 0.1:
+            newVeloY = 0
+        self.setVelo((newVeloX, newVeloY))
         self.posX += self.velo[0]
         self.posY += self.velo[1]
         
+        wallFriction = .1
         if self.wallCollisionX():
-            self.setVelo((-self.velo[0], self.velo[1]))
+            self.setVelo((-self.velo[0] + sign(self.velo[0])*wallFriction, self.velo[1] + sign(self.velo[1])*wallFriction))
         if self.wallCollisionY():
-            self.setVelo((self.velo[0], -self.velo[1]))
+            self.setVelo((self.velo[0] + sign(self.velo[0])*wallFriction, -self.velo[1] + sign(self.velo[1])*wallFriction))
 
     def draw(self):
         self.runVelo()
-        drawCircle(self.posX, self.posY, self.r, fill=self.color)
+        x = pointConvert.cartToPyX(self.posX)
+        y = pointConvert.cartToPyY(self.posY)
+        drawCircle(x+1, y+1, self.r +1, fill=rgb(30, 30, 30), opacity=30)
+        drawCircle(x, y, self.r, fill=self.color)
+        drawCircle(x - 3, y - 3, 2, fill="white", opacity=70)
+        arrowMag = 8
+        drawLine(x, y, x + self.velo[0]* arrowMag, y - self.velo[1]* arrowMag, lineWidth = 3, arrowEnd=True, fill=self.color)
 
 
     def wallCollisionX(self):
-        if not (75 <= self.posX - self.r):
-            self.posX = 75 + self.r
+        x = pointConvert.cartToPyX(self.posX)
+
+        if not ((width-tableWidth)/2 <= x - self.r):
+            x = (width-tableWidth)/2 + self.r
             return True
-        elif not (self.posX + self.r<= 325):
-            self.posX = 325 - self.r
+        elif not (x + self.r<= (width-tableWidth)/2 + tableWidth):
+            x = (width-tableWidth)/2 + tableWidth - self.r
             return True
         return False
 
     def wallCollisionY(self):
-        if not (50 <= self.posY - self.r):
-            self.posY = 50 + self.r
+        y = pointConvert.cartToPyY(self.posY)
+
+        if not ((height-tableHeight)/2 <= y - self.r):
+            y = (height-tableHeight)/2 + self.r
             return True
-        elif not (self.posY + self.r <= 550):
-            self.posY = 550 - self.r
+        elif not (y + self.r <= (height-tableHeight)/2 + tableHeight):
+            y = (height-tableHeight)/2 + tableHeight - self.r
             return True
         return False
+    
+def sign(n):
+    if n == 0:
+        return 0
+    else:
+        return n/abs(n)
