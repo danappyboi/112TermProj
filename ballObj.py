@@ -72,22 +72,20 @@ class ball:
     def wallCollisionX(self):
         x = pointConvert.cartToPyX(self.posX)
 
-        if not ((width-tableWidth)/2 <= x - self.r):
-            x = (width-tableWidth)/2 + self.r
+        if not (-tableWidth/2 <= self.posX - self.r):
+            self.posX = -tableWidth/2 + self.r
             return True
-        elif not (x + self.r<= (width-tableWidth)/2 + tableWidth):
-            x = (width-tableWidth)/2 + tableWidth - self.r
+        elif not (self.posX + self.r <= tableWidth/2):
+            self.posX = tableWidth/2 - self.r
             return True
         return False
 
     def wallCollisionY(self):
-        y = pointConvert.cartToPyY(self.posY)
-
-        if not ((height-tableHeight)/2 <= y - self.r):
-            y = (height-tableHeight)/2 + self.r
+        if not (tableHeight/2 >= self.posY + self.r):
+            self.posY = tableHeight/2 - self.r
             return True
-        elif not (y + self.r <= (height-tableHeight)/2 + tableHeight):
-            y = (height-tableHeight)/2 + tableHeight - self.r
+        elif not (self.posY + self.r >= -tableHeight/2):
+            self.posY = -tableHeight/2 - self.r
             return True
         return False
     
