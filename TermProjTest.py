@@ -1,7 +1,7 @@
 from cmu_graphics import *
 import math
 from ballObj import ball
-from matrixOps import rotateAlgo, revertAlgo
+from matrixOps import rotateAlgo, revertAlgo, dot, dotScalar, add
 import pointConvert
 
 def onAppStart(app):
@@ -23,7 +23,7 @@ def onAppStart(app):
     # app.cueBall = ball(8,0 - 100, "white", velo=(0, 10))
 
     app.redBall = ball(0, 0 + 200, "red", velo=(0,0))
-    app.cueBall = ball(8,0 - 100, "white", velo=(0, 9))
+    app.cueBall = ball(0,0 - 100, "lightGrey", velo=(0, 12))
 
     app.ballList = [app.cueBall, app.redBall]
 
@@ -81,16 +81,40 @@ def checkBallCollisions(app):
                 dy = abs(ball1.posY-ball2.posY)
                 angle = math.degrees(math.atan2(dy,dx))
                 print(angle)
-                
 
-                # if ball1.getVeloAngle() - angle > ball2.getVeloAngle() - angle:
-                #     ball1, ball2 = ball2, ball1
+                #normal vector
+                n = (ball2.posX-ball1.posX, ball2.posY-ball1.posY)
+                
+                #unit normal vector
+                magN = math.sqrt(n[0]**2+n[1]**2)
+                un = (n[0]/magN, n[1]/magN)
+
+                #unit tangent vector
+                ut = (-un[1], un[0])
+
+                v1n = dot(un, ball1.velo)
+                v1t = dot(ut, ball1.velo)
+                v2n = dot(un, ball2.velo)
+                v2t = dot(ut, ball2.velo)
+
+                v1tNew = v1t
+                v2tNew = v2t
+                v1nNew = v2n
+                v2nNew = v1n
+
+                v1nVec = dotScalar(v1nNew, un)
+                v1tVec = dotScalar(v1tNew, ut)
+                v2nVec = dotScalar(v2nNew, un)
+                v2tVec = dotScalar(v2tNew, ut)
+
+                ball1.velo = add(v1nVec, v1tVec)
+                ball2.velo = add(v2nVec, v2tVec)
+
 
                 # this is my code, most of it is probably dogshit
-                
-                ogVector = ball1.getVeloVector()
-                ball1.setVeloVector(ogVector * math.sin(90-angle), 180-(90 + angle))
-                ball2.setVeloVector(ogVector * math.cos(90-angle) + ball2.getVeloVector(), 180-angle)
+                # ogVector = ball1.getVeloVector()
+                # ball1.setVeloVector(ogVector * math.sin(90-angle), 180-(90 + angle))
+                # ball2.setVeloVector(ogVector * math.cos(90-angle) + ball2.getVeloVector(), 180-angle)
 
 
 
