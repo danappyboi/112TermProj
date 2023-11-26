@@ -9,7 +9,7 @@ tableHeight = 450
 
 class ball:
     """The ball object. Has a x, y, color, and velocity. Used for all the balls and the cueball."""
-    def __init__(self, posX, posY, color, velo=(0,0), r=8):
+    def __init__(self, posX, posY, color, striped, velo=(0,0), r=8):
         self.posX = posX
         self.posY = posY
         self.color = color
@@ -17,6 +17,7 @@ class ball:
         self.r = r
         self.friction = .98
         self.pocket = False
+        self.striped = striped
 
     def setVelo(self, velo):
         self.velo = velo
@@ -45,9 +46,9 @@ class ball:
 
         newVeloX = self.velo[0] * self.friction
         newVeloY = self.velo[1] * self.friction
-        if abs(self.velo[0]) <= 0.1:
+        if abs(self.velo[0]) <= 0.03:
             newVeloX = 0
-        if abs(self.velo[1]) <= 0.1:
+        if abs(self.velo[1]) <= 0.03:
             newVeloY = 0
         self.setVelo((newVeloX, newVeloY))
         self.posX += self.velo[0]
@@ -69,6 +70,10 @@ class ball:
         # arrowMag = 8
         # drawLine(x, y, x + self.velo[0]* arrowMag, y - self.velo[1]* arrowMag, lineWidth = 3, arrowEnd=True, fill=self.color)
 
+    def drawStatic(self, x, y):
+        drawCircle(x+1, y+1, self.r +1, fill=rgb(30, 30, 30), opacity=30)
+        drawCircle(x, y, self.r, fill=self.color)
+        drawCircle(x - 3, y - 3, 2, fill="white", opacity=70)
 
     def wallCollisionX(self):
         x = pointConvert.cartToPyX(self.posX)

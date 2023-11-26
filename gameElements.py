@@ -5,6 +5,10 @@ from matrixOps import*
 from pointConvert import*
 
 pocketR = 8
+width = 600
+height = 600
+tableWidth = 225
+tableHeight = 450
 
 def distance(x0, y0, x1, y1):
     return ((x1 - x0)**2 + (y1 - y0)**2)**0.5
@@ -87,7 +91,20 @@ def checkingPockets(ballList, pocketList):
                 ballList.remove(ball)
                 #TODO: you gotta put the ball in one of the players pockets doe
 
+def ballsStopped(ballList):
+    for ball in ballList:
+        print(f"{ball.color}: {ball.getVeloVector()}")
+        if ball.getVeloVector() != 0:
+            return False
+    return True
 
+def drawLeftPockets(playerPocketedBalls):
+    leftCenter = (width - tableWidth)/4
+    drawRect(10, (height-tableHeight)/2 + 10, leftCenter*2-30, tableHeight-20, border="white", fill=rgb(50,50,50), opacity=40)
+    drawLabel("Player Pocketed Balls", leftCenter-3, 100, fill="white", size=15)
+    for i in range(len(playerPocketedBalls)):
+        ball = playerPocketedBalls[i]
+        ball.drawStatic(leftCenter, 150 + i * 40)
 # def moveBallBack(app):
 #     i = 0
 #     while i < len(ballList):

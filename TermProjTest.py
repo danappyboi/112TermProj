@@ -22,11 +22,11 @@ def onAppStart(app):
                    [app.width/2- app.tableWidth/2 + pocketShift, app.height/2]]
     app.angle = 180
 
-    app.redBall = ball(app.tableWidth/2 -25, app.tableHeight/2 -25, "red", velo=(0,0))
-    app.cueBall = ball(app.tableWidth/2 -50,app.tableHeight/2 -50, "lightGrey", velo=(0, 0))
+    app.redBall = ball(app.tableWidth/2 -25, app.tableHeight/2 -25, "red", False, velo=(0,0))
+    app.cueBall = ball(app.tableWidth/2 -50,app.tableHeight/2 -50, "lightGrey", False, velo=(0, 0))
     app.ballList = [app.cueBall, app.redBall]
-    app.player1Pocket = []
-    app.plater2Pocket = []
+    app.player1Pocket = [app.cueBall, app.redBall]
+    app.player2Pocket = []
 
     app.cueStick = cueStickObj(app.cueBall.posX, app.cueBall.posY, app.angle)
 
@@ -51,6 +51,9 @@ def redrawAll(app):
 
     #drawing powerBar
     gameElements.drawPowerBar(app.width/2, app.height - 35, app.cueStick.distFromBall)
+
+    #draw leftPocketed
+    gameElements.drawLeftPockets(app.player1Pocket)
     
     
     # testingNotes(app, app.ballList)
@@ -67,7 +70,6 @@ def testingNotes(app, ballList):
         drawLabel(veloStat, 50, i * spacing + 50 + gap, fill="white", size=10)
         drawLabel(f"Pos: {xStat}, {yStat}", 50, i * spacing + 50 + gap*2, fill="white", size=10)
         drawLabel(f"Pos: {pointConvert.cartToPyX(xStat)}, {pointConvert.cartToPyY(yStat)}", 50, i * spacing + 50 + gap*3, fill="white", size=10)
-
 
 
 def onMouseMove(app, mouseX, mouseY):
@@ -94,14 +96,13 @@ def onKeyHold(app, keys):
         app.cueStick.addPower(-3)
     if "right" in keys or "d" in keys:
         app.cueStick.addPower(3)
-#     pass
 
 def onStep(app):
-    gameElements.checkingPockets(app.ballList, app.pockets)
-
     if not app.playing:
         gameElements.checkBallCollisions(app.ballList)
-    
+        gameElements.checkingPockets(app.ballList, app.pockets)
+        if gameElements.ballsStopped(app.ballList):
+            app.playing = True  
 
 def main():
     runApp()
