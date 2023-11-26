@@ -4,10 +4,11 @@ import math
 
 width = 600
 height = 600
-tableWidth = 250
-tableHeight = 500
+tableWidth = 225
+tableHeight = 450
 
 class ball:
+    """The ball object. Has a x, y, color, and velocity. Used for all the balls and the cueball."""
     def __init__(self, posX, posY, color, velo=(0,0), r=8):
         self.posX = posX
         self.posY = posY
@@ -33,11 +34,12 @@ class ball:
         else:
             return -(90 + angle)
 
-
     
     def setVeloVector(self, vector, angle):
+        print(f"ball angle: {angle}")
         x = vector * math.cos(math.radians(angle))
         y = vector * math.sin(math.radians(angle))
+        print(x, y)
         self.setVelo((x, y))
 
     def runVelo(self): 
@@ -84,8 +86,8 @@ class ball:
         if not (tableHeight/2 >= self.posY + self.r):
             self.posY = tableHeight/2 - self.r
             return True
-        elif not (self.posY + self.r >= -tableHeight/2):
-            self.posY = -tableHeight/2 - self.r
+        elif not (self.posY - self.r >= -tableHeight/2):
+            self.posY = -tableHeight/2 + self.r
             return True
         return False
     
