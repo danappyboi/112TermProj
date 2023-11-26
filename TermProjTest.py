@@ -33,7 +33,7 @@ def redrawAll(app):
     drawRect(app.width/2, app.height/2, app.tableWidth + 25, app.tableHeight + 25, fill="brown", align="center")
     drawRect(app.width/2, app.height/2, app.tableWidth, app.tableHeight, fill="green", align="center")
     for i in range(int(len(app.pockets)/2)):
-        drawCircle(app.pockets[i * 2], app.pockets[i * 2 + 1], 10, fill="black")
+        drawCircle(app.pockets[i * 2], app.pockets[i * 2 + 1], 11, fill="black")
 
     # drawing the ball
     for ball in app.ballList:
@@ -46,6 +46,7 @@ def redrawAll(app):
         app.cueStick.draw()
 
     #drawing powerBar
+    gameElements.drawPowerBar(app.width/2, app.height - 35, app.cueStick.distFromBall)
     
     
     # testingNotes(app, app.ballList)

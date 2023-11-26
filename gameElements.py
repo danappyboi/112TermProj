@@ -70,6 +70,11 @@ def checkBallCollisions(ballList):
                 ball1.velo = add(v1nVec, v1tVec)
                 ball2.velo = add(v2nVec, v2tVec)
 
+def drawPowerBar(x, y, power):
+    barWidth = 200
+    barHeight = 30
+    drawRect(x, y, barWidth, barHeight, border="white", align="center")
+    drawLine(x - barWidth/2 +2, y, x-barWidth/2 + barWidth *(power/100), y, fill="red", lineWidth=barHeight-5, dashes=True)
 
 
 # def moveBallBack(app):
