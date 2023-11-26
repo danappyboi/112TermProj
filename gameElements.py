@@ -4,7 +4,6 @@ from ballObj import ball #do I really not need this?
 from matrixOps import*
 from pointConvert import*
 
-pocketR = 8
 width = 600
 height = 600
 tableWidth = 225
@@ -13,8 +12,9 @@ tableHeight = 450
 def distance(x0, y0, x1, y1):
     return ((x1 - x0)**2 + (y1 - y0)**2)**0.5
 
+#TODO: get a better understanding of this
 def checkBallCollisions(ballList):
-    """The function that does all the math for the ball collisions"""
+    """The function that does all the math for the ball collisions and sets the velocities."""
     for i in range(len(ballList)):
         for j in range(i, len(ballList)):
             if i == j:
@@ -23,7 +23,6 @@ def checkBallCollisions(ballList):
             ball1 = ballList[i]
             ball2 = ballList[j]
            
-
             distanceBetweenBalls = distance(ball1.posX, ball1.posY, ball2.posX, ball2.posY) 
             if distanceBetweenBalls <= (ball1.r + ball2.r):
 
@@ -77,28 +76,34 @@ def checkBallCollisions(ballList):
                 ball2.velo = add(v2nVec, v2tVec)
 
 def drawPowerBar(x, y, power):
+    """Draws the power bar at the bottom of the screen."""
     barWidth = 200
     barHeight = 30
     drawRect(x, y, barWidth, barHeight, border="white", align="center")
     drawLine(x - barWidth/2 +2, y, x-barWidth/2 + barWidth *(power/100), y, fill="red", lineWidth=barHeight-5, dashes=True)
 
-def checkingPockets(ballList, pocketList):
+def checkingPockets(ballList, pocketList, stripedList, nonStripedList):
+    """Checks if any balls have been pocketed and places them in the correct player's pocketed list."""
     for ball in ballList:
         for pocket in pocketList:
-            if distance(cartToPyX(ball.posX), cartToPyY(ball.posY), pocket[0], pocket[1]) < 6:
-                print("pocketed?")
+            if distance(cartToPyX(ball.posX), cartToPyY(ball.posY), pocket[0], pocket[1]) < 10:
                 ball.pocketed = True
                 ballList.remove(ball)
+                if ball.striped:
+                    stripedList.append(ball)
+                else:
+                    nonStripedList.append(ball)
                 #TODO: you gotta put the ball in one of the players pockets doe
 
 def ballsStopped(ballList):
+    """Returns true if all the balls have stopped."""
     for ball in ballList:
-        print(f"{ball.color}: {ball.getVeloVector()}")
         if ball.getVeloVector() != 0:
             return False
     return True
 
 def drawLeftPockets(playerPocketedBalls):
+    """Draws player1 pocket for HUD."""
     leftCenter = (width - tableWidth)/4
     drawRect(10, (height-tableHeight)/2 + 10, leftCenter*2-30, tableHeight-20, border="white", fill=rgb(50,50,50), opacity=40)
     drawLabel("Player Pocketed Balls", leftCenter-3, 100, fill="white", size=15)

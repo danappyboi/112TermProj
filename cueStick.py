@@ -11,6 +11,7 @@ class cueStickObj:
         self.distFromBall = 20
     
     def addPower(self, newDist):
+        """Adds power to the stick, and through gameElements, the power bar."""
         max = 100
         min = 1
         tot = self.distFromBall + newDist
@@ -22,6 +23,7 @@ class cueStickObj:
             self.distFromBall = min
 
     def setAngle(self, angle):
+        """Set the angle of the stick. Gotta plug it into a weird formula, so can't be changed directly."""
         self.angle = -angle -90
 
     #TODO: add some comments that really explain the math, its kinda hard to follow
@@ -40,10 +42,13 @@ class cueStickObj:
         
         self.aim(50)
     
+    #TODO: it'd be pretty cool if it worked on walls and balls
     def aim(self, length):
+        """Draws the dashed line used for aiming. Just a helper function to be used within the class."""
         endX = self.posX + length * -math.cos(math.radians(-(self.angle+90)))
         endY = self.posY + length * math.sin(math.radians(-(self.angle+90)))
         drawLine(self.posX, self.posY, endX, endY, fill="white", dashes=True)
 
     def hitCueBall(self, cueBall):
+        """Sets the velo of the cueBall depending on the angle of the cueStick."""
         cueBall.setVeloVector(self.distFromBall * .5, (-(self.angle+90) + 180) % 360)
