@@ -36,10 +36,8 @@ class ball:
 
     
     def setVeloVector(self, vector, angle):
-        print(f"ball angle: {angle}")
         x = vector * math.cos(math.radians(angle))
         y = vector * math.sin(math.radians(angle))
-        print(x, y)
         self.setVelo((x, y))
 
     def runVelo(self): 

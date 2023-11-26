@@ -17,7 +17,7 @@ class cueStickObj:
         self.angle = -angle -90
 
     #TODO: add some comments that really explain the math, its kinda hard to follow
-    def draw(self, stickSize=300):
+    def draw(self, stickSize=300, aim=True):
         mathAngle = self.angle + 270 #the angle of the mouse and the angle used for math are different for some reason
         newPosY = self.posY
         #the y position of the stick changes depending on whether its above or below the ball. Weird.
@@ -29,8 +29,14 @@ class cueStickObj:
         drawRect(self.posX - ((stickSize)/2 + self.distFromBall)* math.cos(math.radians(mathAngle)), newPosY,
             8, stickSize, fill=gradient("tan", "brown", start="top"), align="top", 
             rotateAngle = self.angle)
+        
+        self.aim(50)
+    
+    def aim(self, length):
+        endX = self.posX + length * -math.cos(math.radians(-(self.angle+90)))
+        endY = self.posY + length * math.sin(math.radians(-(self.angle+90)))
+        drawLine(self.posX, self.posY, endX, endY, fill="white", dashes=True)
 
     def hitCueBall(self, cueBall, playing):
         cueBall.setVeloVector(self.distFromBall, (-(self.angle+90) + 180) % 360)
-        print(f"cue angle:{(math.degrees(self.angle)) % 360}")
         playing = False

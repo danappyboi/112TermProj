@@ -77,7 +77,6 @@ def onKeyPress(app, key):
     if key == "space":
         if app.playing == True:
             app.cueStick.hitCueBall(app.cueBall, app.playing)
-            print(f"app.angle: {math.degrees(app.angle)}")
 
 # def onKeyHold(app, keys):
 #     # if "up" in keys:
