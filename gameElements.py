@@ -2,7 +2,9 @@ import math
 from cmu_graphics import*
 from ballObj import ball #do I really not need this?
 from matrixOps import*
+from pointConvert import*
 
+pocketR = 8
 
 def distance(x0, y0, x1, y1):
     return ((x1 - x0)**2 + (y1 - y0)**2)**0.5
@@ -75,6 +77,15 @@ def drawPowerBar(x, y, power):
     barHeight = 30
     drawRect(x, y, barWidth, barHeight, border="white", align="center")
     drawLine(x - barWidth/2 +2, y, x-barWidth/2 + barWidth *(power/100), y, fill="red", lineWidth=barHeight-5, dashes=True)
+
+def checkingPockets(ballList, pocketList):
+    for ball in ballList:
+        for pocket in pocketList:
+            if distance(cartToPyX(ball.posX), cartToPyY(ball.posY), pocket[0], pocket[1]) < 6:
+                print("pocketed?")
+                ball.pocketed = True
+                ballList.remove(ball)
+                #TODO: you gotta put the ball in one of the players pockets doe
 
 
 # def moveBallBack(app):

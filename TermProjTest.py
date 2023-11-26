@@ -12,17 +12,21 @@ def onAppStart(app):
     app.height = 600
     app.tableWidth = 225
     app.tableHeight = 450
-    app.pockets = [app.width/2 - app.tableWidth/2, app.height/2 - app.tableHeight/2,
-                   app.width/2 + app.tableWidth/2, app.height/2 - app.tableHeight/2,
-                   app.width/2 + app.tableWidth/2, app.height/2,
-                   app.width/2 + app.tableWidth/2, app.height/2 + app.tableHeight/2,
-                   app.width/2 - app.tableWidth/2, app.height/2 + app.tableHeight/2,
-                   app.width/2- app.tableWidth/2, app.height/2]
+    #TODO: the pockets work, but is it too easy?
+    pocketShift = 5
+    app.pockets = [[app.width/2 - app.tableWidth/2 + pocketShift, app.height/2 - app.tableHeight/2 + pocketShift],
+                   [app.width/2 + app.tableWidth/2 - pocketShift, app.height/2 - app.tableHeight/2 + pocketShift],
+                   [app.width/2 + app.tableWidth/2 - pocketShift, app.height/2],
+                   [app.width/2 + app.tableWidth/2 - pocketShift, app.height/2 + app.tableHeight/2 - pocketShift],
+                   [app.width/2 - app.tableWidth/2 + pocketShift, app.height/2 + app.tableHeight/2 - pocketShift],
+                   [app.width/2- app.tableWidth/2 + pocketShift, app.height/2]]
     app.angle = 180
 
-    app.redBall = ball(0, 0 + 200, "red", velo=(0,0))
-    app.cueBall = ball(0,0 - 100, "lightGrey", velo=(0, 0))
+    app.redBall = ball(app.tableWidth/2 -25, app.tableHeight/2 -25, "red", velo=(0,0))
+    app.cueBall = ball(app.tableWidth/2 -50,app.tableHeight/2 -50, "lightGrey", velo=(0, 0))
     app.ballList = [app.cueBall, app.redBall]
+    app.player1Pocket = []
+    app.plater2Pocket = []
 
     app.cueStick = cueStickObj(app.cueBall.posX, app.cueBall.posY, app.angle)
 
@@ -32,8 +36,8 @@ def onAppStart(app):
 def redrawAll(app):
     drawRect(app.width/2, app.height/2, app.tableWidth + 25, app.tableHeight + 25, fill="brown", align="center")
     drawRect(app.width/2, app.height/2, app.tableWidth, app.tableHeight, fill="green", align="center")
-    for i in range(int(len(app.pockets)/2)):
-        drawCircle(app.pockets[i * 2], app.pockets[i * 2 + 1], 11, fill="black")
+    for i in range(int(len(app.pockets))):
+        drawCircle(app.pockets[i][0], app.pockets[i][1], 11, fill="black")
 
     # drawing the ball
     for ball in app.ballList:
@@ -76,12 +80,13 @@ def onMouseMove(app, mouseX, mouseY):
 
 def onKeyPress(app, key):
     if app.playing == True:
-        if key == "a" or key == "left":
+        if key == "s" or key == "down":
             app.cueStick.addPower(-1) #TODO: might make more sense to call this power
-        if key == "d" or key == "right":
+        if key == "w" or key == "up":
             app.cueStick.addPower(1)
         if key == "space":
-                app.cueStick.hitCueBall(app.cueBall, app.playing)
+                app.cueStick.hitCueBall(app.cueBall)
+                app.playing = False
     
 
 def onKeyHold(app, keys):
@@ -92,7 +97,10 @@ def onKeyHold(app, keys):
 #     pass
 
 def onStep(app):
-    gameElements.checkBallCollisions(app.ballList)
+    gameElements.checkingPockets(app.ballList, app.pockets)
+
+    if not app.playing:
+        gameElements.checkBallCollisions(app.ballList)
     
 
 def main():

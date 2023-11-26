@@ -45,6 +45,5 @@ class cueStickObj:
         endY = self.posY + length * math.sin(math.radians(-(self.angle+90)))
         drawLine(self.posX, self.posY, endX, endY, fill="white", dashes=True)
 
-    def hitCueBall(self, cueBall, playing):
+    def hitCueBall(self, cueBall):
         cueBall.setVeloVector(self.distFromBall * .5, (-(self.angle+90) + 180) % 360)
-        playing = False

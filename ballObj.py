@@ -16,6 +16,7 @@ class ball:
         self.velo = velo
         self.r = r
         self.friction = .98
+        self.pocket = False
 
     def setVelo(self, velo):
         self.velo = velo
