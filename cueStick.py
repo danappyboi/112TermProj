@@ -10,8 +10,16 @@ class cueStickObj:
         self.angle = -angle+90
         self.distFromBall = 20
     
-    def setDistFromBall(self, newDist):
-        self.distFromBall = newDist
+    def addPower(self, newDist):
+        max = 100
+        min = 1
+        tot = self.distFromBall + newDist
+        if min <= tot <= max:
+            self.distFromBall += newDist
+        elif tot > max:
+            self.distFromBall = max
+        elif tot < min:
+            self.distFromBall = min
 
     def setAngle(self, angle):
         self.angle = -angle -90
@@ -22,11 +30,11 @@ class cueStickObj:
         newPosY = self.posY
         #the y position of the stick changes depending on whether its above or below the ball. Weird.
         if not(self.angle % 360 < 90 or self.angle % 360 > 270):
-            newPosY -= (stickSize + self.distFromBall) * math.sin(math.radians(mathAngle))
+            newPosY -= (stickSize + self.distFromBall + 9) * math.sin(math.radians(mathAngle))
         else:
-            newPosY -= self.distFromBall * math.sin(math.radians(mathAngle))
+            newPosY -= (self.distFromBall + 9) * math.sin(math.radians(mathAngle))
 
-        drawRect(self.posX - ((stickSize)/2 + self.distFromBall)* math.cos(math.radians(mathAngle)), newPosY,
+        drawRect(self.posX - ((stickSize)/2 + self.distFromBall + 9)* math.cos(math.radians(mathAngle)), newPosY,
             8, stickSize, fill=gradient("tan", "brown", start="top"), align="top", 
             rotateAngle = self.angle)
         
@@ -38,5 +46,5 @@ class cueStickObj:
         drawLine(self.posX, self.posY, endX, endY, fill="white", dashes=True)
 
     def hitCueBall(self, cueBall, playing):
-        cueBall.setVeloVector(self.distFromBall, (-(self.angle+90) + 180) % 360)
+        cueBall.setVeloVector(self.distFromBall * .5, (-(self.angle+90) + 180) % 360)
         playing = False

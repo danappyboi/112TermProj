@@ -74,19 +74,20 @@ def onMouseMove(app, mouseX, mouseY):
 #     pass
 
 def onKeyPress(app, key):
-    if key == "space":
-        if app.playing == True:
-            app.cueStick.hitCueBall(app.cueBall, app.playing)
+    if app.playing == True:
+        if key == "a" or key == "left":
+            app.cueStick.addPower(-1) #TODO: might make more sense to call this power
+        if key == "d" or key == "right":
+            app.cueStick.addPower(1)
+        if key == "space":
+                app.cueStick.hitCueBall(app.cueBall, app.playing)
+    
 
-# def onKeyHold(app, keys):
-#     # if "up" in keys:
-#     #     app.cueBall.posY -= 5
-#     # if "down" in keys:
-#     #     app.cueBall.posY += 5
-#     # if "left" in keys:
-#     #     app.cueBall.posX -= 5
-#     # if "right" in keys:
-#     #     app.cueBall.posX += 5
+def onKeyHold(app, keys):
+    if "left" in keys or "a" in keys:
+        app.cueStick.addPower(-3)
+    if "right" in keys or "d" in keys:
+        app.cueStick.addPower(3)
 #     pass
 
 def onStep(app):
