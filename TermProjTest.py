@@ -1,8 +1,9 @@
 from cmu_graphics import *
 import math
 from ballObj import ball
-from matrixOps import rotateAlgo, revertAlgo, dot, dotScalar, add
-import pointConvert
+from matrixOps import*
+from pointConvert import*
+from cueStick import cueStickObj
 
 def onAppStart(app):
     app.background = "black"
@@ -18,39 +19,12 @@ def onAppStart(app):
                    app.width/2- app.tableWidth/2, app.height/2]
     app.angle = 180
 
-    #TODO: fix whatever tf happens here
-    # app.redBall = ball(0, 0 + 200, "red", velo=(0,0))
-    # app.cueBall = ball(8,0 - 100, "white", velo=(0, 10))
+    app.redBall = ball(0, 0 + 200, "red", velo=(0,0))
+    app.cueBall = ball(0,0 - 100, "lightGrey", velo=(0, 12))
+    app.ballList = [app.cueBall, app.redBall]
 
-    app.redBall = ball(0, 200, "red", velo=(0,0))
-    app.blueBall = ball(0 - 18,200, "blue", velo=(0,0))
-    app.greenBall = ball(0 - 18 * 2, 200, "lime", velo=(0,0))
-    app.orangeBall = ball(0 - 18 * 3, 200, "orange", velo=(0,0))
-    app.yellowBall = ball(0 + 18,200, "yellow", velo=(0,0))
-    app.blackBall = ball(0 + 18 * 2, 200, "black", velo=(0,0))
-    app.purpleBall = ball(0 - 18 * 1.5, 200 - 18, "purple", velo=(0,0))
-    app.pinkBall = ball(0 - 18 * 0.5, 200 - 18, "pink", velo=(0,0))
-    app.grayBall = ball(0 + 18 * 1.5, 200 - 18, "gray", velo=(0,0))
-    app.lightBall = ball(0 + 18 * .5, 200 - 18, "lightBlue", velo=(0,0))
-
-    app.ball1 = ball(0 + 18, 200 - 18 * 2, 'mediumVioletRed', velo=(0,0))
-    app.ball2 = ball(0 - 18, 200 - 18 * 2, 'brown', velo=(0,0))
-    app.ball3 = ball(0, 200 - 18 * 2, 'darkSlateGray', velo=(0,0))
-    app.ball4 = ball(0 - 18 * .5, 200 - 18 * 3, 'fireBrick', velo=(0,0))
-    app.ball5 = ball(0 + 18 * .5, 200 - 18 * 3, 'gold', velo=(0,0))
-    app.ball6 = ball(0, 200 - 18 * 4, 'darkTurquoise', velo=(0,0))
-
-    app.cueBall = ball(0, 0 - 100, "lightGrey", velo=(0,12))
-
-    app.ballList = [app.cueBall, app.redBall, app.blueBall, app.greenBall, 
-                    app.yellowBall, app.blackBall, app.purpleBall, app.pinkBall, 
-                    app.grayBall, app.lightBall, app.ball1, app.ball2,
-                    app.ball3, app.ball4, app.ball5, app.ball6]
-
-    # app.redBall = ball(0, 0 + 200, "red", velo=(0,0))
-    # app.cueBall = ball(0,0 - 100, "lightGrey", velo=(0, 12))
-
-    # app.ballList = [app.cueBall, app.redBall]
+    app.cueStick = cueStickObj(app.cueBall.posX, app.cueBall.posY, app.angle)
+                    #cueStickObj(app.cueBall.posX, app.cueBall.posY, app.angle)
 
 
 #TODO: because im chaning position, this is also probably fucked up, gotta fixxx
@@ -81,9 +55,8 @@ def checkBallCollisions(app):
 
             distanceBetweenBalls = distance(ball1.posX, ball1.posY, ball2.posX, ball2.posY) 
             if distanceBetweenBalls <= (ball1.r + ball2.r):
-                # print("titties")
 
-                # putting them back
+                # # putting them back
                 if distanceBetweenBalls < (ball1.r + ball2.r):
                     if ball1.velo[0] > 0:
                         ball1.posX += (distanceBetweenBalls - (ball1.r + ball2.r))
@@ -101,10 +74,8 @@ def checkBallCollisions(app):
                 #     if ball2.velo[0] != 0:
                 #         ball2.posX += (ball2.velo[0]/abs(ball2.velo[0])) * distanceBetweenBalls/2
 
-                dx = abs(ball1.posX-ball2.posX)
-                dy = abs(ball1.posY-ball2.posY)
-                angle = math.degrees(math.atan2(dy,dx))
-                print(angle)
+
+                #dont even ask me how this shit works, peep this https://www.vobarian.com/collisions/2dcollisions2.pdf 
 
                 #normal vector
                 n = (ball2.posX-ball1.posX, ball2.posY-ball1.posY)
@@ -134,12 +105,10 @@ def checkBallCollisions(app):
                 ball1.velo = add(v1nVec, v1tVec)
                 ball2.velo = add(v2nVec, v2tVec)
 
-                # this is my code, most of it is probably dogshit
-                # ogVector = ball1.getVeloVector()
-                # ball1.setVeloVector(ogVector * math.sin(90-angle), 180-(90 + angle))
-                # ball2.setVeloVector(ogVector * math.cos(90-angle) + ball2.getVeloVector(), 180-angle)
-
-
+# def moveBallBack(app):
+#     i = 0
+#     while i < len(app.ballList):
+#         for j in range(i, len(app.ballList)):
 
 def redrawAll(app):
     drawRect(app.width/2, app.height/2, app.tableWidth + 25, app.tableHeight + 25, fill="brown", align="center")
@@ -150,8 +119,12 @@ def redrawAll(app):
     # drawing the ball
     for ball in app.ballList:
         ball.draw()
+
+    app.cueStick.draw()
+    # print(app.cueStick.posX, app.cueStick.posY)
+    # drawStick(app.cueBall.posX, app.cueBall.posY, app.angle, 10)
     
-    testingNotes(app, app.ballList)
+    # testingNotes(app, app.ballList)
 
 def testingNotes(app, ballList):
     spacing = 100
@@ -164,13 +137,18 @@ def testingNotes(app, ballList):
         drawLabel(f"{ball.color}", 50, i * spacing + 50, fill="white", size=10)
         drawLabel(veloStat, 50, i * spacing + 50 + gap, fill="white", size=10)
         drawLabel(f"Pos: {xStat}, {yStat}", 50, i * spacing + 50 + gap*2, fill="white", size=10)
+        drawLabel(f"Pos: {pointConvert.cartToPyX(xStat)}, {pointConvert.cartToPyY(yStat)}", 50, i * spacing + 50 + gap*3, fill="white", size=10)
 
 
 
-# def onMouseMove(app, mouseX, mouseY):
-#     # posX = app.width/2
-#     # posY = app.height/2
-#     # app.angle = math.degrees(math.atan2(mouseY - posY, mouseX - posX)) - 90
+def onMouseMove(app, mouseX, mouseY):
+    posX = app.cueBall.posX
+    posY = app.cueBall.posY
+    app.angle = math.degrees(math.atan2(mouseY - cartToPyY(posY), mouseX - cartToPyX(posX))) - 90
+    app.cueStick.posX = cartToPyX(posX)
+    app.cueStick.posY = cartToPyY(posY)
+    app.cueStick.angle = app.angle
+    # print(f"angle: {app.angle}")
 #     pass
 
 # def onKeyPress(app, key):
