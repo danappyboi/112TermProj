@@ -1,8 +1,7 @@
 import math
 from cmu_graphics import*
 from ballObj import ball #do I really not need this?
-from matrixOps import*
-from pointConvert import*
+from utilFunctions import*
 import copy
 
 width = 600
@@ -14,6 +13,7 @@ def distance(x0, y0, x1, y1):
     return ((x1 - x0)**2 + (y1 - y0)**2)**0.5
 
 #TODO: get a better understanding of this
+#TODO: gotta put the balls back better
 def checkBallCollisions(ballList):
     """The function that does all the math for the ball collisions and sets the velocities."""
     for i in range(len(ballList)):
@@ -90,10 +90,12 @@ def checkingPockets(ballList, pocketList, stripedList, nonStripedList):
             if distance(cartToPyX(ball.posX), cartToPyY(ball.posY), pocket[0], pocket[1]) < 10:
                 ball.pocketed = True
                 ballList.remove(ball)
-                if ball.striped:
-                    stripedList.append(ball)
-                else:
-                    nonStripedList.append(ball)
+                
+                if not ball.cueBall:
+                    if ball.striped:
+                        stripedList.append(ball)
+                    else:
+                        nonStripedList.append(ball)
                 #TODO: you gotta put the ball in one of the players pockets doe
 
 def ballsStopped(ballList):
@@ -103,16 +105,21 @@ def ballsStopped(ballList):
             return False
     return True
 
+#TODO: I really hate using app in the function, is there a way to get rid of it?
 #TODO: wack implementation
 #TODO: gotta add something for not hitting any balls (remembering the position of all the balls?)
 #TODO: bruh, what if the person hits the other person balls? Now you gotta rember the first ball hit
-def turnLogic(turnPlayer, otherPlayer, stripedBalls, nonStripedBalls):
+def turnLogic(app, turnPlayer, otherPlayer, stripedBalls, nonStripedBalls, cueBall):
     """Based on the player whose turn it is, this function adds their pocketed balls
         and determines the next turn."""
     if turnPlayer.striped:
         #TODO: Add scratches
         #if turnPlayer hits nonStriped balls
-        if len(otherPlayer.pocketed) < len(nonStripedBalls) or app.cueBall.pocketed:
+        if cueBall.pocketed == True:
+            app.scratch = True
+            turnPlayer.turn = False
+            otherPlayer.turn = True
+        elif len(otherPlayer.pocketed) < len(nonStripedBalls) or app.cueBall.pocketed:
             turnPlayer.pocketed = copy.deepcopy(stripedBalls)
             otherPlayer.pocketed = copy.deepcopy(nonStripedBalls)
             turnPlayer.turn = False
@@ -125,7 +132,11 @@ def turnLogic(turnPlayer, otherPlayer, stripedBalls, nonStripedBalls):
             turnPlayer.turn = False
             otherPlayer.turn = True
     else:
-        if len(otherPlayer.pocketed) < len(stripedBalls) or app.cueBall.pocketed:
+        if cueBall.pocketed == True:
+            app.scratch = True
+            turnPlayer.turn = False
+            otherPlayer.turn = True
+        elif len(otherPlayer.pocketed) < len(stripedBalls) or app.cueBall.pocketed:
             turnPlayer.pocketed = copy.deepcopy(nonStripedBalls)
             otherPlayer.pocketed = copy.deepcopy(stripedBalls)
             turnPlayer.turn = False
@@ -150,4 +161,6 @@ def drawPlayerHuds(player1, player2):
     for i in range(len(player2.pocketed)):
         ball = player2.pocketed[i]
         ball.drawStatic(rightCenter, 150 + i * 40)
+
+# def scratch(cueBall):
 

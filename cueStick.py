@@ -1,6 +1,6 @@
 import math
 from cmu_graphics import*
-from pointConvert import*
+from utilFunctions import*
 
 class cueStickObj:
     """The object for the cueStick. Has a posX, posY, and angle. Also able to adjust the distance from the ball for visualizing power."""

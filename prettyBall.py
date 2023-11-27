@@ -1,8 +1,7 @@
 from cmu_graphics import *
 import math
 from ballObj import ball
-from matrixOps import*
-from pointConvert import*
+from utilFunctions import*
 from cueStick import cueStickObj
 import gameElements
 

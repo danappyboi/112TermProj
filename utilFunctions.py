@@ -1,9 +1,22 @@
 import math
 
-class matrix:
-    def __init__(self, array):
-        self.array = array
-    
+#takes in cartesian coords and converts to python
+def cartToPyX(x, width=600):
+    """Converts from Cartseian coords to Python coords for x."""
+    return x + width/2
+
+def cartToPyY(y, height=600):
+    """Converts from Cartiseasn coords to Python coords for y."""
+    return -y + height/2
+
+def pyToCartX(x, width=600):
+    """Converts from Python coords to Cartisean"""
+    return x - width/2
+
+def pyToCartY(y, height=600):
+    """Converts from Cartisean coords to Python coords"""
+    return -(y - height/2)
+
 def rotateAlgo(velo, angle):
     return (math.cos(angle) * velo[0] + math.sin(angle) * velo[1]),(-math.sin(angle) * velo[0] + math.cos(angle) * velo[1])
 

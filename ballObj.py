@@ -1,5 +1,5 @@
 from cmu_graphics import*
-import pointConvert
+from utilFunctions import*
 import math
 
 #TODO: there's no way I can't import these values straight from the main file
@@ -10,7 +10,7 @@ tableHeight = 450
 
 class ball:
     """The ball object. Has a x, y, color, and velocity. Used for all the balls and the cueball."""
-    def __init__(self, posX, posY, color, striped=False, velo=(0,0), r=8):
+    def __init__(self, posX, posY, color, striped=False, velo=(0,0), r=8, cueBall=False):
         self.posX = posX
         self.posY = posY
         self.color = color
@@ -19,6 +19,7 @@ class ball:
         self.friction = .98
         self.pocketed = False
         self.striped = striped
+        self.cueBall = cueBall
 
     def setVelo(self, velo):
         """Sets the velocity of the ball using a tuple."""
@@ -68,8 +69,8 @@ class ball:
     #TODO: pretty ball with animations?
     def draw(self):
         self.runVelo()
-        x = pointConvert.cartToPyX(self.posX)
-        y = pointConvert.cartToPyY(self.posY)
+        x = cartToPyX(self.posX)
+        y = cartToPyY(self.posY)
         drawCircle(x+1, y+1, self.r +1, fill=rgb(30, 30, 30), opacity=30)
         drawCircle(x, y, self.r, fill=self.color)
         drawCircle(x - 3, y - 3, 2, fill="white", opacity=70)
