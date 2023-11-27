@@ -3,6 +3,7 @@ from cmu_graphics import*
 from ballObj import ball #do I really not need this?
 from matrixOps import*
 from pointConvert import*
+import copy
 
 width = 600
 height = 600
@@ -102,15 +103,51 @@ def ballsStopped(ballList):
             return False
     return True
 
-def drawLeftPockets(playerPocketedBalls):
+#TODO: wack implementation
+#TODO: gotta add something for not hitting any balls (remembering the position of all the balls?)
+#TODO: bruh, what if the person hits the other person balls? Now you gotta rember the first ball hit
+def turnLogic(turnPlayer, otherPlayer, stripedBalls, nonStripedBalls):
+    """Based on the player whose turn it is, this function adds their pocketed balls
+        and determines the next turn."""
+    if turnPlayer.striped:
+        #TODO: Add scratches
+        #if turnPlayer hits nonStriped balls
+        if len(otherPlayer.pocketed) < len(nonStripedBalls) or app.cueBall.pocketed:
+            turnPlayer.pocketed = copy.deepcopy(stripedBalls)
+            otherPlayer.pocketed = copy.deepcopy(nonStripedBalls)
+            turnPlayer.turn = False
+            otherPlayer.turn = True 
+        #if turnPlayer pockets more balls
+        elif len(turnPlayer.pocketed) < len(stripedBalls):
+            turnPlayer.pocketed = copy.deepcopy(stripedBalls)
+        #if no balls are pocketed
+        elif len(turnPlayer.pocketed) == len(stripedBalls) and len(otherPlayer.pocketed) == len(nonStripedBalls):
+            turnPlayer.turn = False
+            otherPlayer.turn = True
+    else:
+        if len(otherPlayer.pocketed) < len(stripedBalls) or app.cueBall.pocketed:
+            turnPlayer.pocketed = copy.deepcopy(nonStripedBalls)
+            otherPlayer.pocketed = copy.deepcopy(stripedBalls)
+            turnPlayer.turn = False
+            otherPlayer.turn = True 
+        elif len(turnPlayer.pocketed) < len(nonStripedBalls):
+            turnPlayer.pocketed = copy.deepcopy(nonStripedBalls)
+        elif len(turnPlayer.pocketed) == len(nonStripedBalls) and len(otherPlayer.pocketed) == len(stripedBalls):
+            turnPlayer.turn = False
+            otherPlayer.turn = True
+
+def drawPlayerHuds(player1, player2):
     """Draws player1 pocket for HUD."""
     leftCenter = (width - tableWidth)/4
-    drawRect(10, (height-tableHeight)/2 + 10, leftCenter*2-30, tableHeight-20, border="white", fill=rgb(50,50,50), opacity=40)
-    drawLabel("Player Pocketed Balls", leftCenter-3, 100, fill="white", size=15)
-    for i in range(len(playerPocketedBalls)):
-        ball = playerPocketedBalls[i]
+    rightCenter = (width - tableWidth)/2 + tableWidth + leftCenter
+    drawRect(leftCenter, height/2, leftCenter*2-50, tableHeight-20, align="center", border="white", fill=rgb(50,50,50), opacity=40)
+    drawRect(rightCenter, height/2, leftCenter*2-50, tableHeight-20, align="center", border="white", fill=rgb(50,50,50), opacity=40)
+    drawLabel(f"{player1.name}'s Pocketed Balls", leftCenter, 100, fill="white", size=11, bold=player1.turn)
+    drawLabel(f"{player2.name}'s Pocketed Balls", rightCenter, 100, fill="white", size=11, bold=player2.turn)
+    for i in range(len(player1.pocketed)):
+        ball = player1.pocketed[i]
         ball.drawStatic(leftCenter, 150 + i * 40)
-# def moveBallBack(app):
-#     i = 0
-#     while i < len(ballList):
-#         for j in range(i, len(ballList)):
+    for i in range(len(player2.pocketed)):
+        ball = player2.pocketed[i]
+        ball.drawStatic(rightCenter, 150 + i * 40)
+

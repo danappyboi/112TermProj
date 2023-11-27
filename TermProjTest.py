@@ -5,6 +5,7 @@ from matrixOps import*
 from pointConvert import*
 from cueStick import cueStickObj
 import gameElements
+from player import player
 
 def onAppStart(app):
     app.background = "black"
@@ -22,37 +23,34 @@ def onAppStart(app):
                    [app.width/2- app.tableWidth/2 + pocketShift, app.height/2]]
     app.angle = 180
 
-    app.redBall = ball(0, 200, "red", velo=(0,0))
-    app.blueBall = ball(0 - 18,200, "blue", velo=(0,0))
-    app.greenBall = ball(0 - 18 * 2, 200, "lime", velo=(0,0))
-    app.orangeBall = ball(0 - 18 * 3, 200, "orange", velo=(0,0))
-    app.yellowBall = ball(0 + 18,200, "yellow", velo=(0,0))
-    app.blackBall = ball(0 + 18 * 2, 200, "black", velo=(0,0))
-    app.purpleBall = ball(0 - 18 * 1.5, 200 - 18, "purple", velo=(0,0))
-    app.pinkBall = ball(0 - 18 * 0.5, 200 - 18, "pink", velo=(0,0))
-    app.grayBall = ball(0 + 18 * 1.5, 200 - 18, "gray", velo=(0,0))
-    app.lightBall = ball(0 + 18 * .5, 200 - 18, "lightBlue", velo=(0,0))
-
-    app.ball1 = ball(0 + 18, 200 - 18 * 2, 'mediumVioletRed', velo=(0,0))
-    app.ball2 = ball(0 - 18, 200 - 18 * 2, 'brown', velo=(0,0))
-    app.ball3 = ball(0, 200 - 18 * 2, 'darkSlateGray', velo=(0,0))
-    app.ball4 = ball(0 - 18 * .5, 200 - 18 * 3, 'fireBrick', velo=(0,0))
-    app.ball5 = ball(0 + 18 * .5, 200 - 18 * 3, 'gold', velo=(0,0))
-    app.ball6 = ball(0, 200 - 18 * 4, 'darkTurquoise', velo=(0,0))
+    app.red1 = ball(0, 200, "red", striped = True, velo=(0,0))
+    app.red2 = ball(0 - 18,200, "red",striped = True, velo=(0,0))
+    app.red3 = ball(0 - 18 * 2, 200, "red",striped = True, velo=(0,0))
+    app.red4 = ball(0 - 18 * 3, 200, "red",striped = True, velo=(0,0))
+    app.red5 = ball(0 + 18,200, "red",striped = True, velo=(0,0))
+    app.blue1 = ball(0 + 18 * 2, 200, "blue", velo=(0,0))
+    app.blue2 = ball(0 - 18 * 1.5, 200 - 18, "blue", velo=(0,0))
+    app.blue3 = ball(0 - 18 * 0.5, 200 - 18, "blue", velo=(0,0))
+    app.blue4 = ball(0 + 18 * 1.5, 200 - 18, "blue", velo=(0,0))
+    app.blue5 = ball(0 + 18 * .5, 200 - 18, "blue", velo=(0,0))
 
     app.cueBall = ball(0, 0 - 100, "lightGrey", velo=(0,0))
 
-    app.ballList = [app.cueBall, app.redBall, app.blueBall, app.greenBall, 
-                    app.yellowBall, app.blackBall, app.purpleBall, app.pinkBall, 
-                    app.grayBall, app.lightBall, app.ball1, app.ball2,
-                    app.ball3, app.ball4, app.ball5, app.ball6]
+    app.ballList = [app.cueBall, app.red1, app.red2, app.red3, 
+                    app.red4, app.red5, app.blue1, app.blue2, 
+                    app.blue3, app.blue4, app.blue5]
     
-    app.player1Pocket = []
-    app.player2Pocket = []
+    app.player1 = player("Player 1")
+    app.player1.turn = True
+    app.player1.striped = True
+    app.player2 = player("AI")
+    app.nonStripedBalls = []
+    app.stripedBalls = []
 
     app.cueStick = cueStickObj(app.cueBall.posX, app.cueBall.posY, app.angle)
 
     app.playing = True
+    app.firstBallPocketed = False
 
 
 def redrawAll(app):
@@ -75,7 +73,7 @@ def redrawAll(app):
     gameElements.drawPowerBar(app.width/2, app.height - 35, app.cueStick.distFromBall)
 
     #draw leftPocketed
-    gameElements.drawLeftPockets(app.player1Pocket)
+    gameElements.drawPlayerHuds(app.player1, app.player2)
     
     
     # testingNotes(app, app.ballList)
@@ -91,7 +89,7 @@ def testingNotes(app, ballList):
         drawLabel(f"{ball.color}", 50, i * spacing + 50, fill="white", size=10)
         drawLabel(veloStat, 50, i * spacing + 50 + gap, fill="white", size=10)
         drawLabel(f"Pos: {xStat}, {yStat}", 50, i * spacing + 50 + gap*2, fill="white", size=10)
-        drawLabel(f"Pos: {pointConvert.cartToPyX(xStat)}, {pointConvert.cartToPyY(yStat)}", 50, i * spacing + 50 + gap*3, fill="white", size=10)
+        drawLabel(f"Pos: {cartToPyX(xStat)}, {cartToPyY(yStat)}", 50, i * spacing + 50 + gap*3, fill="white", size=10)
 
 
 def onMouseMove(app, mouseX, mouseY):
@@ -122,8 +120,12 @@ def onKeyHold(app, keys):
 def onStep(app):
     if not app.playing:
         gameElements.checkBallCollisions(app.ballList)
-        gameElements.checkingPockets(app.ballList, app.pockets, app.player2Pocket, app.player1Pocket)
+        gameElements.checkingPockets(app.ballList, app.pockets, app.stripedBalls, app.nonStripedBalls)
         if gameElements.ballsStopped(app.ballList):
+            if app.player1.turn: 
+                gameElements.turnLogic(app.player1, app.player2, app.stripedBalls, app.nonStripedBalls)
+            else:
+                gameElements.turnLogic(app.player2, app.player1, app.stripedBalls, app.nonStripedBalls)
             app.playing = True  
 
 def main():

@@ -17,7 +17,7 @@ class ball:
         self.velo = velo
         self.r = r
         self.friction = .98
-        self.pocket = False
+        self.pocketed = False
         self.striped = striped
 
     def setVelo(self, velo):
@@ -73,7 +73,7 @@ class ball:
         drawCircle(x+1, y+1, self.r +1, fill=rgb(30, 30, 30), opacity=30)
         drawCircle(x, y, self.r, fill=self.color)
         drawCircle(x - 3, y - 3, 2, fill="white", opacity=70)
-        
+
         # arrowMag = 8
         # drawLine(x, y, x + self.velo[0]* arrowMag, y - self.velo[1]* arrowMag, lineWidth = 3, arrowEnd=True, fill=self.color)
 
@@ -85,8 +85,6 @@ class ball:
 
     def wallCollisionX(self):
         """Determining whether or not the ball has collided with the left and right walls."""
-        x = pointConvert.cartToPyX(self.posX)
-
         if not (-tableWidth/2 <= self.posX - self.r):
             self.posX = -tableWidth/2 + self.r
             return True
