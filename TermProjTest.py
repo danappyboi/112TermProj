@@ -24,7 +24,7 @@ def onAppStart(app):
                    [app.width/2- app.tableWidth/2 + pocketShift, app.height/2]]
     app.angle = 180
 
-    app.red1 = ball(-225/4, 0, "red", striped = True, velo=(0,0))
+    app.red1 = ball(-50, + 50, "red", striped = True, velo=(0,0))
     app.red2 = ball(0 - 18,200, "red",striped = True, velo=(0,0))
     app.red3 = ball(0 - 18 * 2, 200, "red",striped = True, velo=(0,0))
     app.red4 = ball(0 - 18 * 3, 200, "red",striped = True, velo=(0,0))
@@ -35,7 +35,7 @@ def onAppStart(app):
     app.blue4 = ball(0 + 18 * 1.5, 200 - 18, "blue", velo=(0,0))
     app.blue5 = ball(0 + 18 * .5, 200 - 18, "blue", velo=(0,0))
 
-    app.cueBall = ball(100, 20, "lightGrey", velo=(0,0), cueBall = True)
+    app.cueBall = ball(100, 100, "lightGrey", velo=(0,0), cueBall = True)
 
     app.ballList = [app.cueBall, app.red1]
     # app.ballList = [app.cueBall, app.red1, app.red2, app.red3, 
@@ -84,9 +84,6 @@ def redrawAll(app):
     
     # testing(app, app.ballList)
 
-    for ball in app.testBallList:
-        print(ball.velo)
-        ball.draw()
 
 def testing(app, ballList):
     """a function for anything being tested"""
@@ -134,9 +131,10 @@ def onKeyPress(app, key):
             app.playing = False
         #For testing:
         if key == "enter":
-            aiAngle = ai.determineBestAngle(app.red1, app.pockets[5], app.cueBall, app.testBallList)
+            aiAngle = ai.determineBestAngle(app.red1, app.pockets[5], app.cueBall)
+            aiPower = ai.determineBestMagnitude(app.cueBall, app.red1, app.pockets[5])
             app.cueStick.setAngle(aiAngle)
-            app.cueStick.setPower(10)
+            app.cueStick.setPower(aiPower)
             app.cueStick.hitCueBall(app.cueBall)
             app.playing = False
     
@@ -154,6 +152,7 @@ def onStep(app):
         if gameElements.ballsStopped(app.ballList):
             if app.player1.turn: 
                 gameElements.turnLogic(app, app.player1, app.player2, app.stripedBalls, app.nonStripedBalls, app.cueBall)
+                print(app.cueBall.posY)
             else:
                 gameElements.turnLogic(app, app.player2, app.player1, app.stripedBalls, app.nonStripedBalls, app.cueBall)
             app.playing = True  

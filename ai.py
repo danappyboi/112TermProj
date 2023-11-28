@@ -2,7 +2,6 @@ from cmu_graphics import*
 import math
 from utilFunctions import*
 from cueStick import cueStickObj
-import copy
 from gameElements import setVeloAfterCollision
 # import ballObj #would have done it the other way, but it makes writing code easier
 
@@ -15,7 +14,7 @@ def hitTheBall(cueStick, cueBall, power, angle):
 
 #TODO: what about the velocity?
 #TODO: is it safe to assume the ball isnt moving?
-def determineBestAngle(ball, pocket, cueBall, ballList):
+def determineBestAngle(ball, pocket, cueBall):
     """For a given ball, this function returns the best angle and velocity for 
         the cueBall to be shot at in order to the ball to be pocketed into a given
         pocket."""
@@ -32,7 +31,15 @@ def determineBestAngle(ball, pocket, cueBall, ballList):
                                                 cueBall.posX - hypoCueX))
     return angleHypoCueToCue
 
+def determineBestMagnitude(cueBall, ball, pocket):
+    """Returns a magnitude for a given ball and pocket."""
+    distBTP = distance(ball.posX, ball.posY, pyToCartX(pocket[0]), pyToCartY(pocket[1]))
+    distBTC = distance(cueBall.posX, cueBall.posY, ball.posX, ball.posY)
 
+    val = 2 * ((distBTC + distBTP)/47.5 + 2) 
+    #literally no rhyme or reason for this value, 
+    #just works well enough
+    return val
 
     
 
