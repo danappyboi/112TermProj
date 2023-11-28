@@ -1,6 +1,8 @@
 import math
 
-#takes in cartesian coords and converts to python
+def distance(x0, y0, x1, y1):
+    return ((x1 - x0)**2 + (y1 - y0)**2)**0.5
+
 def cartToPyX(x, width=600):
     """Converts from Cartseian coords to Python coords for x."""
     return x + width/2
@@ -33,4 +35,11 @@ def dotScalar(c, v):
 
 def add(v1, v2):
     """Adds two tuples."""
-    return (v1[0] + v2[1], v1[1] + v2[1])
+    return (v1[0] + v2[0], v1[1] + v2[1])
+
+def sign(n):
+    """Dumb helper function to help determine the sign of a number."""
+    if n == 0:
+        return 0
+    else:
+        return int(n/abs(n))

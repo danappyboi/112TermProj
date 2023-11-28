@@ -21,6 +21,10 @@ class ball:
         self.striped = striped
         self.cueBall = cueBall
 
+    def setPos(self, posX, posY):
+        self.posX = posX
+        self.posY = posY
+
     def setVelo(self, velo):
         """Sets the velocity of the ball using a tuple."""
         self.velo = velo
@@ -104,9 +108,4 @@ class ball:
             return True
         return False
     
-def sign(n):
-    """Dumb helper function to help determine the sign of a number."""
-    if n == 0:
-        return 0
-    else:
-        return n/abs(n)
+    # def __eq__(self):

@@ -21,10 +21,13 @@ class cueStickObj:
             self.distFromBall = max
         elif tot < min:
             self.distFromBall = min
+    
+    def setPower(self, newDist):
+        self.distFromBall = newDist
 
     def setAngle(self, angle):
         """Set the angle of the stick. Gotta plug it into a weird formula, so can't be changed directly."""
-        self.angle = -angle -90
+        self.angle = -angle-90
 
     #TODO: add some comments that really explain the math, its kinda hard to follow
     def draw(self, stickSize=300, aim=True):

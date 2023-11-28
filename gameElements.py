@@ -9,13 +9,46 @@ height = 600
 tableWidth = 225
 tableHeight = 450
 
-def distance(x0, y0, x1, y1):
-    return ((x1 - x0)**2 + (y1 - y0)**2)**0.5
 
-#TODO: get a better understanding of this
+#peep this https://www.vobarian.com/collisions/2dcollisions2.pdf 
+def setVeloAfterCollision(ball1, ball2):
+    """Sets the velocity of 2 balls after they collide. Does not account for the 
+        change in their position."""
+    #normal vector
+    n = (ball2.posX-ball1.posX, ball2.posY-ball1.posY)
+    
+    #unit normal vector
+    magN = math.sqrt(n[0]**2+n[1]**2)
+    un = (n[0]/magN, n[1]/magN)
+
+    #unit tangent vector
+    ut = (-un[1], un[0])
+
+    #finding the scalars to project velos to norm and tang
+    v1n = dot(un, ball1.velo)
+    v1t = dot(ut, ball1.velo)
+    v2n = dot(un, ball2.velo)
+    v2t = dot(ut, ball2.velo)
+
+    #setting the new scalars after collision
+    v1tNew = v1t
+    v2tNew = v2t
+    v1nNew = v2n
+    v2nNew = v1n
+    
+    #multiply the new scalars to the vectors to find the new vecs
+    v1nVec = dotScalar(v1nNew, un)
+    v1tVec = dotScalar(v1tNew, ut)
+    v2nVec = dotScalar(v2nNew, un)
+    v2tVec = dotScalar(v2tNew, ut)
+
+    #set the vecs
+    ball1.velo = add(v1nVec, v1tVec)
+    ball2.velo = add(v2nVec, v2tVec)
+
 #TODO: gotta put the balls back better
 def checkBallCollisions(ballList):
-    """The function that does all the math for the ball collisions and sets the velocities."""
+    """The function that does all the math for the ball collisions."""
     for i in range(len(ballList)):
         for j in range(i, len(ballList)):
             if i == j:
@@ -45,36 +78,7 @@ def checkBallCollisions(ballList):
                 #     if ball2.velo[0] != 0:
                 #         ball2.posX += (ball2.velo[0]/abs(ball2.velo[0])) * distanceBetweenBalls/2
 
-
-                #dont even ask me how this shit works, peep this https://www.vobarian.com/collisions/2dcollisions2.pdf 
-
-                #normal vector
-                n = (ball2.posX-ball1.posX, ball2.posY-ball1.posY)
-                
-                #unit normal vector
-                magN = math.sqrt(n[0]**2+n[1]**2)
-                un = (n[0]/magN, n[1]/magN)
-
-                #unit tangent vector
-                ut = (-un[1], un[0])
-
-                v1n = dot(un, ball1.velo)
-                v1t = dot(ut, ball1.velo)
-                v2n = dot(un, ball2.velo)
-                v2t = dot(ut, ball2.velo)
-
-                v1tNew = v1t
-                v2tNew = v2t
-                v1nNew = v2n
-                v2nNew = v1n
-
-                v1nVec = dotScalar(v1nNew, un)
-                v1tVec = dotScalar(v1tNew, ut)
-                v2nVec = dotScalar(v2nNew, un)
-                v2tVec = dotScalar(v2tNew, ut)
-
-                ball1.velo = add(v1nVec, v1tVec)
-                ball2.velo = add(v2nVec, v2tVec)
+                setVeloAfterCollision(ball1, ball2)
 
 def drawPowerBar(x, y, power):
     """Draws the power bar at the bottom of the screen."""

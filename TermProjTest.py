@@ -5,6 +5,7 @@ from utilFunctions import*
 from cueStick import cueStickObj
 import gameElements
 from player import player
+import ai
 
 
 def onAppStart(app):
@@ -23,7 +24,7 @@ def onAppStart(app):
                    [app.width/2- app.tableWidth/2 + pocketShift, app.height/2]]
     app.angle = 180
 
-    app.red1 = ball(0, 200, "red", striped = True, velo=(0,0))
+    app.red1 = ball(-225/4, 0, "red", striped = True, velo=(0,0))
     app.red2 = ball(0 - 18,200, "red",striped = True, velo=(0,0))
     app.red3 = ball(0 - 18 * 2, 200, "red",striped = True, velo=(0,0))
     app.red4 = ball(0 - 18 * 3, 200, "red",striped = True, velo=(0,0))
@@ -34,18 +35,22 @@ def onAppStart(app):
     app.blue4 = ball(0 + 18 * 1.5, 200 - 18, "blue", velo=(0,0))
     app.blue5 = ball(0 + 18 * .5, 200 - 18, "blue", velo=(0,0))
 
-    app.cueBall = ball(0, 0 - 100, "lightGrey", velo=(0,0), cueBall = True)
+    app.cueBall = ball(100, 20, "lightGrey", velo=(0,0), cueBall = True)
 
-    app.ballList = [app.cueBall, app.red1, app.red2, app.red3, 
-                    app.red4, app.red5, app.blue1, app.blue2, 
-                    app.blue3, app.blue4, app.blue5]
+    app.ballList = [app.cueBall, app.red1]
+    # app.ballList = [app.cueBall, app.red1, app.red2, app.red3, 
+    #                 app.red4, app.red5, app.blue1, app.blue2, 
+    #                 app.blue3, app.blue4, app.blue5]
     
     app.player1 = player("Player 1")
     app.player1.turn = True
     app.player1.striped = True
     app.player2 = player("AI")
+    app.AI = player("Actual AI")
     app.nonStripedBalls = []
     app.stripedBalls = []
+
+    app.testBallList =[]
 
     app.cueStick = cueStickObj(app.cueBall.posX, app.cueBall.posY, app.angle)
 
@@ -77,35 +82,42 @@ def redrawAll(app):
     gameElements.drawPlayerHuds(app.player1, app.player2)
     
     
-    # testingNotes(app, app.ballList)
+    # testing(app, app.ballList)
 
-def testingNotes(app, ballList):
-    spacing = 100
-    gap = 15
-    for i in range(len(ballList)):
-        ball = ballList[i]
-        veloStat = (math.ceil(ball.velo[0]*1000)/1000, math.ceil(ball.velo[1]*1000)/1000) 
-        xStat = math.ceil(ball.posX*1000)/1000
-        yStat = math.ceil(ball.posY*1000)/1000
-        drawLabel(f"{ball.color}", 50, i * spacing + 50, fill="white", size=10)
-        drawLabel(veloStat, 50, i * spacing + 50 + gap, fill="white", size=10)
-        drawLabel(f"Pos: {xStat}, {yStat}", 50, i * spacing + 50 + gap*2, fill="white", size=10)
-        drawLabel(f"Pos: {cartToPyX(xStat)}, {cartToPyY(yStat)}", 50, i * spacing + 50 + gap*3, fill="white", size=10)
+    for ball in app.testBallList:
+        print(ball.velo)
+        ball.draw()
+
+def testing(app, ballList):
+    """a function for anything being tested"""
+    for ball in ballList:
+        if not ball.cueBall:
+            dxBTB = app.cueBall.posX - ball.posX
+            dyBTB = app.cueBall.posY - ball.posY
+
+            pos1 = revertAlgo((0 + 2 * ball.r, 0), math.atan2(dyBTB, dxBTB) - math.pi/2)
+            pos2 = revertAlgo((0 - 2 * ball.r, 0), math.atan2(dyBTB, dxBTB) - math.pi/2)
+            pos1 = add(pos1, (ball.posX, ball.posY))
+            pos2 = add(pos2, (ball.posX, ball.posY))
+
+            drawCircle(cartToPyX(pos1[0]), cartToPyY(pos1[1]), 5, fill="purple", border="black")
+            drawCircle(cartToPyX(pos2[0]), cartToPyY(pos2[1]), 5, fill="purple", border="black")
 
 
 def onMouseMove(app, mouseX, mouseY):
-    if app.scratch:
-        app.cueBall.setVelo((0,0))
-        app.cueBall.pocketed = False
-        if app.cueBall not in app.ballList:
-            app.ballList.append(app.cueBall)
-        app.cueBall.posX = pyToCartX(mouseX)
-        app.cueBall.posY = pyToCartY(mouseY)
-    else:
-        posX = app.cueBall.posX
-        posY = app.cueBall.posY
-        app.angle = -math.degrees(math.atan2(mouseY - cartToPyY(posY), mouseX - cartToPyX(posX)))
-        app.cueStick.setAngle(app.angle)
+    if app.AI.turn == False:
+        if app.scratch:
+            app.cueBall.setVelo((0,0))
+            app.cueBall.pocketed = False
+            if app.cueBall not in app.ballList:
+                app.ballList.append(app.cueBall)
+            app.cueBall.posX = pyToCartX(mouseX)
+            app.cueBall.posY = pyToCartY(mouseY)
+        else:
+            posX = app.cueBall.posX
+            posY = app.cueBall.posY
+            app.angle = -math.degrees(math.atan2(mouseY - cartToPyY(posY), mouseX - cartToPyX(posX)))
+            app.cueStick.setAngle(app.angle)
 
 def onMousePress(app, mouseX, mouseY):
     if app.scratch:
@@ -118,8 +130,15 @@ def onKeyPress(app, key):
         if key == "w" or key == "up":
             app.cueStick.addPower(1)
         if key == "space":
-                app.cueStick.hitCueBall(app.cueBall)
-                app.playing = False
+            app.cueStick.hitCueBall(app.cueBall)
+            app.playing = False
+        #For testing:
+        if key == "enter":
+            aiAngle = ai.determineBestAngle(app.red1, app.pockets[5], app.cueBall, app.testBallList)
+            app.cueStick.setAngle(aiAngle)
+            app.cueStick.setPower(10)
+            app.cueStick.hitCueBall(app.cueBall)
+            app.playing = False
     
 
 def onKeyHold(app, keys):
@@ -133,9 +152,6 @@ def onStep(app):
         gameElements.checkBallCollisions(app.ballList)
         gameElements.checkingPockets(app.ballList, app.pockets, app.stripedBalls, app.nonStripedBalls)
         if gameElements.ballsStopped(app.ballList):
-            # if app.cueBall.pocketed:
-            #     app.ballList.append(app.cueBall)
-            #     app.cueBall.pocketed = False
             if app.player1.turn: 
                 gameElements.turnLogic(app, app.player1, app.player2, app.stripedBalls, app.nonStripedBalls, app.cueBall)
             else:
