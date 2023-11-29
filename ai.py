@@ -14,6 +14,7 @@ def hitTheBall(cueStick, cueBall, ballList, pocketList, striped):
     cueStick.setPower(power)
     cueStick.setAngle(angle)
     cueStick.hitCueBall(cueBall)
+    print(f"firing at: {pocketList.index(targetPocket)}")
 
 #TODO: really basic rn
 def determineBestBall(cueBall, ballList, pocketList, striped):
@@ -21,12 +22,24 @@ def determineBestBall(cueBall, ballList, pocketList, striped):
 
     for ball in ballList: 
         if ball.legal(striped):
-            if not ballInPath(cueBall, ball, ballList):
-                for pocket in pocketList:
-                    angle = determineBestAngle(ball, pocket, cueBall)
-                    print(f"angle in dbb: {angle} {possibleAngle(ball, cueBall, angle)}")
-                    if possibleAngle(ball, cueBall, angle):
-                        bestShots.append((ball, pocket, angle, determineBestPower(cueBall, ball, pocket)))
+            for pocket in pocketList:
+                dxBTP = ball.posX - pyToCartX(pocket[0])
+                dyBTP = ball.posY - pyToCartY(pocket[1])
+
+                angleToPocket = math.degrees(math.atan2(dyBTP,dxBTP))
+
+                hypoCueX = ball.posX + 2 * ball.r * math.cos(math.radians(angleToPocket))
+                hypoCueY = ball.posY + 2 * ball.r * math.sin(math.radians(angleToPocket))
+
+                targetPoint = (hypoCueX, hypoCueY)
+                if cueBallInPosition(cueBall, targetPoint, pocket):
+                    if not ballInPath(cueBall, targetPoint, ballList):
+                        angle = determineBestAngle(ball, pocket, cueBall)
+                        if possibleAngle(ball, cueBall, angle):
+                            print(f"angle in dbb: {angle} {possibleAngle(ball, cueBall, angle)}")
+                            print(f"pocket in dbb: {pocketList.index(pocket)}")
+
+                            bestShots.append((ball, pocket, angle, determineBestPower(cueBall, ball, pocket)))
     
     #just hit the first legal ball
     if bestShots == []:
@@ -38,7 +51,34 @@ def determineBestBall(cueBall, ballList, pocketList, striped):
     else:
         #hit the first possible good hit
         print("not shit")
-        return bestShots[0]
+        bestAngle = 0
+        bestShot = 0
+        for shot in bestShots:
+            angle = shot[2]
+            ball = shot[0]
+            dyCTB = cueBall.posY - ball.posY
+            dxCTB = cueBall.posX - ball.posX
+            straightAngle = math.degrees(math.atan2(dyCTB, dxCTB))
+            print(f"{shot[1]}, {abs(angleDiff(angle, straightAngle))}")
+            # print(angle, straightAngle)
+            # print(f"angle diff1: {angleDiff(angle, straightAngle)}")
+            # print(f"angle diff2: {angleDiff(bestAngle, straightAngle)}")
+            if abs(angleDiff(angle, straightAngle)) < abs(angleDiff(bestAngle, straightAngle)):
+                bestAngle = angle
+                bestShot = shot
+                
+        return bestShot
+
+            
+def cueBallInPosition(cueBall, targetPoint, pocket):
+    minX = min(targetPoint[0], pyToCartX(pocket[0]))
+    maxX = max(targetPoint[0], pyToCartX(pocket[0]))
+    minY = min(targetPoint[1], pyToCartY(pocket[1]))
+    maxY = max(targetPoint[1], pyToCartY(pocket[1]))
+
+    if (minX < cueBall.posX < maxX):
+        return False
+    return True
 
 def possibleAngle(ball, cueBall, angle):
     """Returns if the angle provided is possible for the cueBall to make."""
@@ -60,7 +100,7 @@ def possibleAngle(ball, cueBall, angle):
     dyCTPos2 = cueBall.posY - pos2[1]
     angle2 = math.degrees(math.atan2(dyCTPos2, dxCTPos2))
 
-    print(f"angles in question: {angle1} {angle2}")
+    # print(f"angles in question: {angle1} {angle2}")
     #TODO: hopefully angle1 and 2 shouldn't be flipped
     return angleInRange(angle, angle2 + buffer, angle1 - buffer) #hopefully angle1 and 2 shouldn't be flipped
 
@@ -69,6 +109,11 @@ def possibleAngle(ball, cueBall, angle):
 #just wanted a quick and simple solution https://stackoverflow.com/questions/66799475/how-to-elegantly-find-if-an-angle-is-between-a-range
 def angleInRange(alpha, lower, upper):
     return (alpha - lower) % 360 <= (upper - lower) % 360
+
+#another one https://stackoverflow.com/questions/1878907/how-can-i-find-the-smallest-difference-between-two-angles-around-a-point 
+def angleDiff(angle1, angle2):
+    a = angle1 - angle2
+    return (a + 180) % 360 - 180
 
 
 #TODO: is it safe to assume the ball isnt moving?
@@ -99,21 +144,27 @@ def determineBestPower(cueBall, ball, pocket):
     #just works well enough
     return val
 
-def ballInPath(cueBall, targetBall, ballList):
+def ballInPath(cueBall, targetPoint, ballList):
     """Determines whether or not a ball is in the path of the cueBall 
-        and a given targetBall"""
+        and a given targetPoint"""
     for ball in ballList:
-        if (ball != targetBall) and (ball != cueBall):
-            perpPoint = perpendPointOnLine(cueBall, targetBall, ball)
+        if (ball != cueBall):
+            perpPoint = perpendPointOnLine(cueBall, targetPoint, ball)
             if distance(ball.posX, ball.posY, perpPoint[0], perpPoint[1]) <= 2* ball.r:
-                return True
+                minBallX = min(targetPoint[0], cueBall.posX)
+                maxBallX = max(targetPoint[0], cueBall.posX)
+                minBallY = min(targetPoint[1], cueBall.posY)
+                maxBallY = max(targetPoint[1], cueBall.posY)
+                
+                if (minBallX <= ball.posX <= maxBallX) and (minBallY <= ball.posY <= maxBallY):
+                    return True
     return False
 
-def perpendPointOnLine(cueBall, targetBall, ball):
+def perpendPointOnLine(cueBall, targetPoint, ball):
     """Finds the point that creates a line perpendicular to the line
     created by the targetBall and cueBall that goes through the ball."""
-    dx = targetBall.posX - cueBall.posX
-    dy = targetBall.posY - cueBall.posY
+    dx = targetPoint[0] - cueBall.posX
+    dy = targetPoint[1] - cueBall.posY
 
     if dx == 0:
         slope = dy/100000
@@ -127,7 +178,7 @@ def perpendPointOnLine(cueBall, targetBall, ball):
 
     invMat = [[slope/(slope**2+1), -slope/(slope**2+1)],
               [-1/(slope**2+1), -(slope**2)/(slope**2+1)]]
-    bVec = [-targetBall.posY+slope*targetBall.posX, 
+    bVec = [-targetPoint[0]+slope*targetPoint[1], 
             -ball.posY + -(invSlope)*ball.posX]
     
     pointX = (invMat[0][0] * bVec[0] + invMat[0][1] * bVec[1])

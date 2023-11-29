@@ -45,6 +45,10 @@ def setVeloAfterCollision(ball1, ball2):
     #set the vecs
     ball1.velo = add(v1nVec, v1tVec)
     ball2.velo = add(v2nVec, v2tVec)
+    # print(f"ball1: {math.degrees(math.atan2(ball1.velo[1],ball1.velo[0]))}")
+    # print(f"ball1 nat angle: {ball1.getVeloAngle()}")
+    # print(f"ball2: {math.degrees(math.atan2(ball2.velo[1],ball2.velo[0]))}")
+    # print(f"ball2 nat angle: {ball2.getVeloAngle()}")
 
 #TODO: gotta put the balls back better
 def checkBallCollisions(ballList):
@@ -58,25 +62,32 @@ def checkBallCollisions(ballList):
             ball2 = ballList[j]
            
             distanceBetweenBalls = distance(ball1.posX, ball1.posY, ball2.posX, ball2.posY) 
-            if distanceBetweenBalls <= (ball1.r + ball2.r):
+            if distanceBetweenBalls < (ball1.r + ball2.r):
 
-                # # putting them back
-                if distanceBetweenBalls < (ball1.r + ball2.r):
-                    if ball1.velo[0] > 0:
-                        ball1.posX += (distanceBetweenBalls - (ball1.r + ball2.r))
-                    else:
-                        ball1.posX -= (distanceBetweenBalls - (ball1.r + ball2.r)) 
-
-                    if ball1.velo[1] > 0:
-                        ball1.posY += (distanceBetweenBalls - (ball1.r + ball2.r))
-                    else:
-                        ball1.posY -= (distanceBetweenBalls - (ball1.r + ball2.r))
-
+                # putting them back
                 # if distanceBetweenBalls < (ball1.r + ball2.r):
-                #     if ball1.velo[0] != 0:
-                #         ball1.posX += (ball1.velo[0]/abs(ball1.velo[0])) * distanceBetweenBalls/2
-                #     if ball2.velo[0] != 0:
-                #         ball2.posX += (ball2.velo[0]/abs(ball2.velo[0])) * distanceBetweenBalls/2
+                #     if ball1.velo[0] > 0:
+                #         ball1.posX += (distanceBetweenBalls - (ball1.r + ball2.r))
+                #     else:
+                #         ball1.posX -= (distanceBetweenBalls - (ball1.r + ball2.r)) 
+
+                #     if ball1.velo[1] > 0:
+                #         ball1.posY += (distanceBetweenBalls - (ball1.r + ball2.r))
+                #     else:
+                #         ball1.posY -= (distanceBetweenBalls - (ball1.r + ball2.r))
+
+                dx = ball2.posX - ball1.posX
+                dy = ball2.posY - ball1.posY
+                angle = math.atan2(dy, dx)
+
+                newBall1Pos = revertAlgo((-(2 * ball1.r - distanceBetweenBalls)/2, 0), angle)
+                newBall2Pos = revertAlgo(((2 * ball2.r - distanceBetweenBalls)/2, 0), angle)
+                
+                newBall1Pos = add(newBall1Pos, (ball1.posX, ball1.posY))
+                newBall2Pos = add(newBall2Pos, (ball2.posX, ball2.posY))
+                ball1.posX, ball1.posY = newBall1Pos
+                ball2.posX, ball2.posY = newBall2Pos
+                
 
                 setVeloAfterCollision(ball1, ball2)
 
