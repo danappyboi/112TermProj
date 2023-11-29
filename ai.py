@@ -76,7 +76,7 @@ def cueBallInPosition(cueBall, targetPoint, pocket):
     minY = min(targetPoint[1], pyToCartY(pocket[1]))
     maxY = max(targetPoint[1], pyToCartY(pocket[1]))
 
-    if (minX < cueBall.posX < maxX):
+    if (minX < cueBall.posX < maxX) or (minY < cueBall.posY < maxY):
         return False
     return True
 
