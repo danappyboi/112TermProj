@@ -10,7 +10,7 @@ tableHeight = 450
 
 class ball:
     """The ball object. Has a x, y, color, and velocity. Used for all the balls and the cueball."""
-    def __init__(self, posX, posY, color, striped=False, velo=(0,0), r=8, cueBall=False):
+    def __init__(self, posX, posY, color, striped=False, velo=(0,0), r=8, cueBall=False, ball8=False):
         self.posX = posX
         self.posY = posY
         self.color = color
@@ -20,10 +20,15 @@ class ball:
         self.pocketed = False
         self.striped = striped
         self.cueBall = cueBall
+        self.ball8 = ball8
 
     def setPos(self, posX, posY):
         self.posX = posX
         self.posY = posY
+
+    def legal(self, striped):
+        return self.striped == striped and not self.cueBall and not self.ball8
+
 
     def setVelo(self, velo):
         """Sets the velocity of the ball using a tuple."""
@@ -108,4 +113,14 @@ class ball:
             return True
         return False
     
-    # def __eq__(self):
+    def __repr__(self):
+        if not self.cueBall:
+            return f"{self.color}"
+        else:
+            return "cueball"
+    
+    def __hash__(self):
+        return hash(self + str(self.posX) + str(self.posY))
+    
+    # def __eq__(self, other):
+    #     return self == other

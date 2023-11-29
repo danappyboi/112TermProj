@@ -36,8 +36,10 @@ def onAppStart(app):
     app.blue5 = ball(0 + 18 * .5, 200 - 18, "blue", velo=(0,0))
 
     app.cueBall = ball(100, 100, "lightGrey", velo=(0,0), cueBall = True)
+    app.redTest = ball(-100, -100, "red", striped = True, velo=(0,0))
+    app.blueTest = ball(45, -70, "blue", velo=(0,0))
 
-    app.ballList = [app.cueBall, app.red1]
+    app.ballList = [app.cueBall, app.redTest, app.blueTest]
     # app.ballList = [app.cueBall, app.red1, app.red2, app.red3, 
     #                 app.red4, app.red5, app.blue1, app.blue2, 
     #                 app.blue3, app.blue4, app.blue5]
@@ -82,23 +84,14 @@ def redrawAll(app):
     gameElements.drawPlayerHuds(app.player1, app.player2)
     
     
-    # testing(app, app.ballList)
+    # testing(app)
 
 
-def testing(app, ballList):
+def testing(app):
     """a function for anything being tested"""
-    for ball in ballList:
-        if not ball.cueBall:
-            dxBTB = app.cueBall.posX - ball.posX
-            dyBTB = app.cueBall.posY - ball.posY
-
-            pos1 = revertAlgo((0 + 2 * ball.r, 0), math.atan2(dyBTB, dxBTB) - math.pi/2)
-            pos2 = revertAlgo((0 - 2 * ball.r, 0), math.atan2(dyBTB, dxBTB) - math.pi/2)
-            pos1 = add(pos1, (ball.posX, ball.posY))
-            pos2 = add(pos2, (ball.posX, ball.posY))
-
-            drawCircle(cartToPyX(pos1[0]), cartToPyY(pos1[1]), 5, fill="purple", border="black")
-            drawCircle(cartToPyX(pos2[0]), cartToPyY(pos2[1]), 5, fill="purple", border="black")
+    (x, y) = ai.perpendPointOnLine(app.cueBall, app.redTest, app.blueTest)
+    drawCircle(cartToPyX(x), cartToPyY(y), 5, fill="purple")
+    print(ai.ballInPath(app.cueBall, app.redTest, app.ballList))
 
 
 def onMouseMove(app, mouseX, mouseY):
@@ -152,7 +145,6 @@ def onStep(app):
         if gameElements.ballsStopped(app.ballList):
             if app.player1.turn: 
                 gameElements.turnLogic(app, app.player1, app.player2, app.stripedBalls, app.nonStripedBalls, app.cueBall)
-                print(app.cueBall.posY)
             else:
                 gameElements.turnLogic(app, app.player2, app.player1, app.stripedBalls, app.nonStripedBalls, app.cueBall)
             app.playing = True  
