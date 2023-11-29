@@ -36,7 +36,7 @@ def onAppStart(app):
     app.blue5 = ball(0 + 18 * .5, 200 - 18, "blue", velo=(0,0))
 
     app.cueBall = ball(100, 100, "lightGrey", velo=(0,0), cueBall = True)
-    app.redTest = ball(-100, -100, "red", striped = True, velo=(0,0))
+    app.redTest = ball(50, 60, "red", striped = True, velo=(0,0))
     app.blueTest = ball(45, -70, "blue", velo=(0,0))
 
     app.ballList = [app.cueBall, app.redTest, app.blueTest]
@@ -90,9 +90,9 @@ def redrawAll(app):
 def testing(app):
     """a function for anything being tested"""
     (x, y) = ai.perpendPointOnLine(app.cueBall, app.redTest, app.blueTest)
-    drawCircle(cartToPyX(x), cartToPyY(y), 5, fill="purple")
-    print(ai.ballInPath(app.cueBall, app.redTest, app.ballList))
-
+    pos1, pos2 = ai.possibleAngle(app.redTest, app.cueBall)
+    drawCircle(pos1[0], pos1[1], 5, fill="purple")
+    drawCircle(pos2[0], pos2[1], 5, fill="purple")
 
 def onMouseMove(app, mouseX, mouseY):
     if app.AI.turn == False:
@@ -124,11 +124,13 @@ def onKeyPress(app, key):
             app.playing = False
         #For testing:
         if key == "enter":
-            aiAngle = ai.determineBestAngle(app.red1, app.pockets[5], app.cueBall)
-            aiPower = ai.determineBestMagnitude(app.cueBall, app.red1, app.pockets[5])
-            app.cueStick.setAngle(aiAngle)
-            app.cueStick.setPower(aiPower)
-            app.cueStick.hitCueBall(app.cueBall)
+            # aiAngle = ai.determineBestAngle(app.redTest, app.pockets[5], app.cueBall)
+            # aiPower = ai.determineBestPower(app.cueBall, app.red1, app.pockets[5])
+            # print(aiAngle)
+            # app.cueStick.setAngle(aiAngle)
+            # app.cueStick.setPower(aiPower)
+            # app.cueStick.hitCueBall(app.cueBall)
+            ai.hitTheBall(app.cueStick, app.cueBall, app.ballList, app.pockets, True)
             app.playing = False
     
 

@@ -8,31 +8,67 @@ import sys
 # import ballObj #would have done it the other way, but it makes writing code easier
 
 #TODO: think you could animate the way it moves?
-def hitTheBall(cueStick, cueBall, power, angle):
+def hitTheBall(cueStick, cueBall, ballList, pocketList, striped):
+    #TODO: targetBall and targetPocket are redunant
+    targetBall, targetPocket, angle, power = determineBestBall(cueBall, ballList, pocketList, striped)
     cueStick.setPower(power)
-    cueStick.angle(angle) #not done
+    cueStick.setAngle(angle)
     cueStick.hitCueBall(cueBall)
 
-
-
 #TODO: really basic rn
-def determineBestBall(cueBall, ballList, striped):
-    possibleBallsAndPockets = []
+def determineBestBall(cueBall, ballList, pocketList, striped):
+    bestShots = []
 
-    for ball in ballList:
+    for ball in ballList: 
         if ball.legal(striped):
             if not ballInPath(cueBall, ball, ballList):
-                possibleBallsAndPockets.append(ball)
+                for pocket in pocketList:
+                    angle = determineBestAngle(ball, pocket, cueBall)
+                    print(f"angle in dbb: {angle} {possibleAngle(ball, cueBall, angle)}")
+                    if possibleAngle(ball, cueBall, angle):
+                        bestShots.append((ball, pocket, angle, determineBestPower(cueBall, ball, pocket)))
     
     #just hit the first legal ball
-    if possibleBallsAndPockets == []:
+    if bestShots == []:
         for ball in ballList:
             if ball.legal(striped):
-                return ball
+                print("shit.")
+                return (ball, pocketList[0], determineBestAngle(ball, pocketList[0], cueBall), 
+                        determineBestPower(cueBall, ball, pocketList[0]))
     else:
         #hit the first possible good hit
-        return possibleBallsAndPockets[0]
+        print("not shit")
+        return bestShots[0]
 
+def possibleAngle(ball, cueBall, angle):
+    """Returns if the angle provided is possible for the cueBall to make."""
+    dxBTC = ball.posX - cueBall.posX
+    dyBTC = ball.posY - cueBall.posY
+
+    angleBTC = math.atan2(dyBTC, dxBTC)
+    pos1 = revertAlgo((0, 2 * ball.r), angleBTC)
+    pos2 = revertAlgo((0, -2*ball.r), angleBTC)
+    pos1 = add(pos1, (ball.posX, ball.posY))
+    pos2 = add(pos2, (ball.posX, ball.posY))
+
+    buffer = 1
+    """Buffer angle to make sure it doesn't take crazy 90° shots"""
+    dxCTPos1 = cueBall.posX - pos1[0]
+    dyCTPos1 = cueBall.posY - pos1[1]
+    angle1 = math.degrees(math.atan2(dyCTPos1, dxCTPos1))
+    dxCTPos2 = cueBall.posX - pos2[0]
+    dyCTPos2 = cueBall.posY - pos2[1]
+    angle2 = math.degrees(math.atan2(dyCTPos2, dxCTPos2))
+
+    print(f"angles in question: {angle1} {angle2}")
+    #TODO: hopefully angle1 and 2 shouldn't be flipped
+    return angleInRange(angle, angle2 + buffer, angle1 - buffer) #hopefully angle1 and 2 shouldn't be flipped
+
+    # return (cartToPyX(pos1[0]), cartToPyY(pos1[1])), (cartToPyX(pos2[0]), cartToPyY(pos2[1]))
+
+#just wanted a quick and simple solution https://stackoverflow.com/questions/66799475/how-to-elegantly-find-if-an-angle-is-between-a-range
+def angleInRange(alpha, lower, upper):
+    return (alpha - lower) % 360 <= (upper - lower) % 360
 
 
 #TODO: is it safe to assume the ball isnt moving?
@@ -53,7 +89,7 @@ def determineBestAngle(ball, pocket, cueBall):
                                                 cueBall.posX - hypoCueX))
     return angleHypoCueToCue
 
-def determineBestMagnitude(cueBall, ball, pocket):
+def determineBestPower(cueBall, ball, pocket):
     """Returns a magnitude for a given ball and pocket."""
     distBTP = distance(ball.posX, ball.posY, pyToCartX(pocket[0]), pyToCartY(pocket[1]))
     distBTC = distance(cueBall.posX, cueBall.posY, ball.posX, ball.posY)
