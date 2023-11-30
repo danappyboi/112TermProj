@@ -47,8 +47,9 @@ def setVeloAfterCollision(ball1, ball2):
     ball2.velo = add(v2nVec, v2tVec)
 
 #TODO: gotta put the balls back better
-def checkBallCollisions(ballList):
+def checkBallCollisions(app, ballList):
     """The function that does all the math for the ball collisions."""
+
     for i in range(len(ballList)):
         for j in range(i, len(ballList)):
             if i == j:
@@ -59,7 +60,7 @@ def checkBallCollisions(ballList):
            
             distanceBetweenBalls = distance(ball1.posX, ball1.posY, ball2.posX, ball2.posY) 
             if distanceBetweenBalls < (ball1.r + ball2.r):
-                
+                app.ballTouched = True               
                 dx = ball2.posX - ball1.posX
                 dy = ball2.posY - ball1.posY
                 angle = math.atan2(dy, dx)
@@ -104,20 +105,37 @@ def ballsStopped(ballList):
             return False
     return True
 
+def checkWin(app, ball8, playerList):
+    if ball8.pocketed == True:
+        for i in range(2):
+            if playerList[i].turn:
+                app.gameOver
+                if len(playerList[i].pocketed) == 8:
+                    print("ding ding ding")
+                else:
+                    print("damn. thats crazy")
+                app.playing = False
+                break
+
 #TODO: I really hate using app in the function, is there a way to get rid of it?
 #TODO: wack implementation
 #TODO: gotta add something for not hitting any balls (remembering the position of all the balls?)
 #TODO: bruh, what if the person hits the other person balls? Now you gotta rember the first ball hit
-def turnLogic(app, turnPlayer, otherPlayer, stripedBalls, nonStripedBalls, cueBall):
+def turnLogic(app, turnPlayer, otherPlayer, stripedBalls, nonStripedBalls, cueBall, ballTouched):
     """Based on the player whose turn it is, this function adds their pocketed balls
         and determines the next turn."""
-    if turnPlayer.striped:
-        #if turnPlayer hits nonStriped balls
-        if cueBall.pocketed == True:
+    if cueBall.pocketed == True:
             app.scratch = True
             turnPlayer.turn = False
             otherPlayer.turn = True
-        elif len(otherPlayer.pocketed) < len(nonStripedBalls) or app.cueBall.pocketed:
+    elif ballTouched == False:
+        app.scratch = True
+        turnPlayer.turn = False
+        otherPlayer.turn = True
+
+    if turnPlayer.striped:
+        #if turnPlayer hits nonStriped balls
+        if len(otherPlayer.pocketed) < len(nonStripedBalls) or app.cueBall.pocketed:
             turnPlayer.pocketed = copy.copy(stripedBalls)
             otherPlayer.pocketed = copy.copy(nonStripedBalls)
             turnPlayer.turn = False
@@ -130,11 +148,7 @@ def turnLogic(app, turnPlayer, otherPlayer, stripedBalls, nonStripedBalls, cueBa
             turnPlayer.turn = False
             otherPlayer.turn = True
     else:
-        if cueBall.pocketed == True:
-            app.scratch = True
-            turnPlayer.turn = False
-            otherPlayer.turn = True
-        elif len(otherPlayer.pocketed) < len(stripedBalls) or app.cueBall.pocketed:
+        if len(otherPlayer.pocketed) < len(stripedBalls) or app.cueBall.pocketed:
             turnPlayer.pocketed = copy.copy(nonStripedBalls)
             otherPlayer.pocketed = copy.copy(stripedBalls)
             turnPlayer.turn = False

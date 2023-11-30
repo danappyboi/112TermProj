@@ -27,12 +27,14 @@ def onAppStart(app):
                    [app.width/2- app.tableWidth/2 + pocketShift, app.height/2]]
     app.angle = 180
 
-    ballPositions.totalBallSetup()
+    ballPositions.threeBalls()
     app.ballList = copy.copy(app.initalBallList)
 
     app.player1 = player("Player 1")
     app.AIPlayer = player("AI")
     app.player1.turn = True
+    app.AIPlayer.striped = True
+    app.player1.striped = False
 
     app.playerList = [app.player1, app.AIPlayer] #TODO: kinda don't like this implementation
     app.nonStripedBalls = []
@@ -42,7 +44,9 @@ def onAppStart(app):
 
     app.playing = True
     app.firstBallPocketed = False
+    app.ballTouched = False
     app.scratch = False
+    app.gameOver = False
 
 
 def redrawAll(app):
@@ -153,7 +157,7 @@ def onStep(app):
         app.playing = False
 
     if not app.playing:
-        gameElements.checkBallCollisions(app.ballList)
+        gameElements.checkBallCollisions(app, app.ballList)
         gameElements.checkingPockets(app.ballList, app.pockets, app.stripedBalls, app.nonStripedBalls)
 
         #If the first ball has been pocketed, the stripe goes to the player
@@ -170,11 +174,13 @@ def onStep(app):
                         break
             
         if gameElements.ballsStopped(app.ballList):
+            gameElements.checkWin(app, app.ball8, app.playerList)
             if app.player1.turn: 
-                gameElements.turnLogic(app, app.player1, app.AIPlayer, app.stripedBalls, app.nonStripedBalls, app.cueBall)
+                gameElements.turnLogic(app, app.player1, app.AIPlayer, app.stripedBalls, app.nonStripedBalls, app.cueBall, app.ballTouched)
             else:
-                gameElements.turnLogic(app, app.AIPlayer, app.player1, app.stripedBalls, app.nonStripedBalls, app.cueBall)
+                gameElements.turnLogic(app, app.AIPlayer, app.player1, app.stripedBalls, app.nonStripedBalls, app.cueBall, app.ballTouched)
             app.playing = True  
+            app.ballTouched = False
 
 def main():
     runApp()

@@ -43,6 +43,29 @@ def determineBestBall(cueBall, ballList, pocketList, striped):
                         angle = determineBestAngle(ball, pocket, cueBall)
                         if possibleAngle(ball, cueBall, angle):
                             bestShots.append((ball, pocket, angle, determineBestPower(cueBall, ball, pocket)))
+
+    if only8BallLeft(ballList, striped) != False:
+        ball8 = only8BallLeft(ballList, striped)
+        for pocket in pocketList:
+            dx8TP = ball8.posX - pyToCartX(pocket[0])
+            dy8TP = ball8.posY - pyToCartY(pocket[1])
+
+            angleToPocket = math.degrees(math.atan2(dy8TP,dx8TP))
+
+            """hypoCue represents the position of the best ball placement based on the pocket"""
+            hypoCueX = ball8.posX + 2 * ball8.r * math.cos(math.radians(angleToPocket))
+            hypoCueY = ball8.posY + 2 * ball8.r * math.sin(math.radians(angleToPocket))
+
+            targetPoint = (hypoCueX, hypoCueY)
+            pocketPoint = (pyToCartX(pocket[0]), pyToCartY(pocket[1]))
+
+            if cueBallInPosition(cueBall, targetPoint, pocket):
+                #TODO: i dont think the second one is working
+                    if not ballInPath(cueBall, targetPoint, ballList) and not ballInPath(ball8, pocketPoint, ballList):
+                        angle = determineBestAngle(ball8, pocket, cueBall)
+                        if possibleAngle(ball8, cueBall, angle):
+                            bestShots.append((ball8, pocket, angle, determineBestPower(cueBall, ball8, pocket)))
+
     
     """If there's no good shots, just hit the first ball in the ballList."""
     if bestShots == []:
@@ -67,6 +90,15 @@ def determineBestBall(cueBall, ballList, pocketList, striped):
                 bestShot = shot
                 
         return bestShot
+
+def only8BallLeft(ballList, striped):
+    for ball in ballList:
+        if ball.legal(striped):
+            return False
+    for i in range(len(ballList)):
+        if ballList[i].ball8:
+            return ballList[i]
+
 
 def scratch(app, cueBall, ballList, pocketList, striped):
     """Returns new cueBall positions and the angle and ball to aim for after a scratch. 
