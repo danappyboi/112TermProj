@@ -10,5 +10,5 @@ class player:
         #TODO: boy wouldn't that be fancy?
         self.name = name
         self.pocketed = []
-        self.striped = False
+        self.striped = None
         self.turn = False

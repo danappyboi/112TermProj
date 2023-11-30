@@ -7,6 +7,7 @@ import gameElements
 from player import player
 import ai
 import ballPositions
+import copy
 
 
 def onAppStart(app):
@@ -36,28 +37,30 @@ def onAppStart(app):
     # app.blue4 = ball(0 + 18 * 1.5, 200 - 18, "blue", velo=(0,0))
     # app.blue5 = ball(0 + 18 * .5, 200 - 18, "blue", velo=(0,0))
 
-    app.cueBall = ball(0, -100, "lightGrey", velo=(0,0), cueBall = True)
-    app.redTest = ball(50, 60, "red", striped = True, velo=(0,0))
-    app.blueTest = ball(45, -70, "blue", velo=(0,0))
+    # app.cueBall = ball(0, -100, "lightGrey", velo=(0,0), cueBall = True)
+    # app.redTest = ball(50, 60, "red", striped = True, velo=(0,0))
+    # app.blueTest = ball(45, -70, "blue", velo=(0,0))
 
-    app.ballList = [app.cueBall, app.redTest, app.blueTest]
+    # app.ballList = [app.cueBall, app.redTest, app.blueTest]
     # app.ballList = [app.cueBall, app.red1, app.red2, app.red3, 
     #                 app.red4, app.red5, app.blue1, app.blue2, 
     #                 app.blue3, app.blue4, app.blue5]
     
 
-    # ballPositions.totalBallSetup()
+    ballPositions.totalBallSetup()
     # ballPositions.testPhysics()
 
     app.player1 = player("Player 1")
     app.player1.turn = True
-    app.player1.striped = True
+    # app.player1.striped = True
     app.player2 = player("AI")
     app.AI = player("Actual AI")
+    app.playerList = [app.player1, app.player2] #TODO: kinda don't like this implementation
     app.nonStripedBalls = []
     app.stripedBalls = []
 
     app.testBallList =[]
+    app.ballList = copy.copy(app.initalBallList)
     app.testPoint = (0,0)
     app.testPoint1 = (0,0)
 
@@ -65,7 +68,7 @@ def onAppStart(app):
 
     app.playing = True
     app.firstBallPocketed = False
-    app.scratch = True
+    app.scratch = False
 
 
 def redrawAll(app):
@@ -90,10 +93,9 @@ def redrawAll(app):
 
     #draw leftPocketed
     gameElements.drawPlayerHuds(app.player1, app.player2)
+
+    # print(app.firstBallPocketed)
     
-    # print(app.testPoint[0], app.testPoint[1])
-    drawCircle(cartToPyX(app.testPoint[0]), cartToPyY(app.testPoint[1]), 5, fill="white")
-    drawCircle(cartToPyX(app.testPoint1[0]), cartToPyY(app.testPoint1[1]), 5, fill="red")
     # testing(app,app.redTest,app.pockets[1])
 
 
@@ -132,7 +134,7 @@ def onMousePress(app, mouseX, mouseY):
 def onKeyPress(app, key):
     if app.playing == True:
         if key == "s" or key == "down":
-            app.cueStick.addPower(-1) #TODO: might make more sense to call this power
+            app.cueStick.addPower(-1)
         if key == "w" or key == "up":
             app.cueStick.addPower(1)
         if key == "space":
@@ -140,14 +142,8 @@ def onKeyPress(app, key):
             app.playing = False
         #For testing:
         if key == "enter":
-            # aiAngle = ai.determineBestAngle(app.redTest, app.pockets[1], app.cueBall)
-            # aiPower = ai.determineBestPower(app.cueBall, app.redTest, app.pockets[1])
-            # print(aiAngle)
-            # app.cueStick.setAngle(aiAngle)
-            # app.cueStick.setPower(aiPower)
-            # app.cueStick.hitCueBall(app.cueBall)
-            app.testPoint = (app.cueBall.posX, app.cueBall.posY)
-            app.testPoint1 = (app.redTest.posX, app.redTest.posY)
+            # app.testPoint = (app.cueBall.posX, app.cueBall.posY)
+            # app.testPoint1 = (app.redTest.posX, app.redTest.posY)
             ai.hitTheBall(app.cueStick, app.cueBall, app.ballList, app.pockets, True)
             app.playing = False
     
@@ -162,6 +158,19 @@ def onStep(app):
     if not app.playing:
         gameElements.checkBallCollisions(app.ballList)
         gameElements.checkingPockets(app.ballList, app.pockets, app.stripedBalls, app.nonStripedBalls)
+
+        if not app.firstBallPocketed:
+            for ball in app.initalBallList:
+                if ball.pocketed:
+                    app.firstBallPocketed = True
+                    for i in range(len(app.playerList)):
+                        if app.playerList[i].turn:
+                            app.playerList[i].striped = ball.striped
+                        else:
+                            app.playerList[i].striped = not ball.striped
+                    break
+            
+
         if gameElements.ballsStopped(app.ballList):
             if app.player1.turn: 
                 gameElements.turnLogic(app, app.player1, app.player2, app.stripedBalls, app.nonStripedBalls, app.cueBall)

@@ -45,10 +45,6 @@ def setVeloAfterCollision(ball1, ball2):
     #set the vecs
     ball1.velo = add(v1nVec, v1tVec)
     ball2.velo = add(v2nVec, v2tVec)
-    # print(f"ball1: {math.degrees(math.atan2(ball1.velo[1],ball1.velo[0]))}")
-    # print(f"ball1 nat angle: {ball1.getVeloAngle()}")
-    # print(f"ball2: {math.degrees(math.atan2(ball2.velo[1],ball2.velo[0]))}")
-    # print(f"ball2 nat angle: {ball2.getVeloAngle()}")
 
 #TODO: gotta put the balls back better
 def checkBallCollisions(ballList):
@@ -63,19 +59,7 @@ def checkBallCollisions(ballList):
            
             distanceBetweenBalls = distance(ball1.posX, ball1.posY, ball2.posX, ball2.posY) 
             if distanceBetweenBalls < (ball1.r + ball2.r):
-
-                # putting them back
-                # if distanceBetweenBalls < (ball1.r + ball2.r):
-                #     if ball1.velo[0] > 0:
-                #         ball1.posX += (distanceBetweenBalls - (ball1.r + ball2.r))
-                #     else:
-                #         ball1.posX -= (distanceBetweenBalls - (ball1.r + ball2.r)) 
-
-                #     if ball1.velo[1] > 0:
-                #         ball1.posY += (distanceBetweenBalls - (ball1.r + ball2.r))
-                #     else:
-                #         ball1.posY -= (distanceBetweenBalls - (ball1.r + ball2.r))
-
+                
                 dx = ball2.posX - ball1.posX
                 dy = ball2.posY - ball1.posY
                 angle = math.atan2(dy, dx)
@@ -128,20 +112,19 @@ def turnLogic(app, turnPlayer, otherPlayer, stripedBalls, nonStripedBalls, cueBa
     """Based on the player whose turn it is, this function adds their pocketed balls
         and determines the next turn."""
     if turnPlayer.striped:
-        #TODO: Add scratches
         #if turnPlayer hits nonStriped balls
         if cueBall.pocketed == True:
             app.scratch = True
             turnPlayer.turn = False
             otherPlayer.turn = True
         elif len(otherPlayer.pocketed) < len(nonStripedBalls) or app.cueBall.pocketed:
-            turnPlayer.pocketed = copy.deepcopy(stripedBalls)
-            otherPlayer.pocketed = copy.deepcopy(nonStripedBalls)
+            turnPlayer.pocketed = copy.copy(stripedBalls)
+            otherPlayer.pocketed = copy.copy(nonStripedBalls)
             turnPlayer.turn = False
             otherPlayer.turn = True 
         #if turnPlayer pockets more balls
         elif len(turnPlayer.pocketed) < len(stripedBalls):
-            turnPlayer.pocketed = copy.deepcopy(stripedBalls)
+            turnPlayer.pocketed = copy.copy(stripedBalls)
         #if no balls are pocketed
         elif len(turnPlayer.pocketed) == len(stripedBalls) and len(otherPlayer.pocketed) == len(nonStripedBalls):
             turnPlayer.turn = False
@@ -152,15 +135,21 @@ def turnLogic(app, turnPlayer, otherPlayer, stripedBalls, nonStripedBalls, cueBa
             turnPlayer.turn = False
             otherPlayer.turn = True
         elif len(otherPlayer.pocketed) < len(stripedBalls) or app.cueBall.pocketed:
-            turnPlayer.pocketed = copy.deepcopy(nonStripedBalls)
-            otherPlayer.pocketed = copy.deepcopy(stripedBalls)
+            turnPlayer.pocketed = copy.copy(nonStripedBalls)
+            otherPlayer.pocketed = copy.copy(stripedBalls)
             turnPlayer.turn = False
             otherPlayer.turn = True 
         elif len(turnPlayer.pocketed) < len(nonStripedBalls):
-            turnPlayer.pocketed = copy.deepcopy(nonStripedBalls)
+            turnPlayer.pocketed = copy.copy(nonStripedBalls)
         elif len(turnPlayer.pocketed) == len(nonStripedBalls) and len(otherPlayer.pocketed) == len(stripedBalls):
             turnPlayer.turn = False
             otherPlayer.turn = True
+
+def testStriped(player):
+    if player.striped:
+        return "red"
+    else:
+        return "white"
 
 def drawPlayerHuds(player1, player2):
     """Draws player1 pocket for HUD."""
@@ -168,8 +157,8 @@ def drawPlayerHuds(player1, player2):
     rightCenter = (width - tableWidth)/2 + tableWidth + leftCenter
     drawRect(leftCenter, height/2, leftCenter*2-50, tableHeight-20, align="center", border="white", fill=rgb(50,50,50), opacity=40)
     drawRect(rightCenter, height/2, leftCenter*2-50, tableHeight-20, align="center", border="white", fill=rgb(50,50,50), opacity=40)
-    drawLabel(f"{player1.name}'s Pocketed Balls", leftCenter, 100, fill="white", size=11, bold=player1.turn)
-    drawLabel(f"{player2.name}'s Pocketed Balls", rightCenter, 100, fill="white", size=11, bold=player2.turn)
+    drawLabel(f"{player1.name}'s Pocketed Balls", leftCenter, 100, fill=testStriped(player1), size=11, bold=player1.turn)
+    drawLabel(f"{player2.name}'s Pocketed Balls", rightCenter, 100, fill=testStriped(player2), size=11, bold=player2.turn)
     for i in range(len(player1.pocketed)):
         ball = player1.pocketed[i]
         ball.drawStatic(leftCenter, 150 + i * 40)

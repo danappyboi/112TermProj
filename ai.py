@@ -7,6 +7,8 @@ import copy
 import sys
 # import ballObj #would have done it the other way, but it makes writing code easier
 
+#TODO: still lk kinda inaccurate
+
 #TODO: think you could animate the way it moves?
 def hitTheBall(cueStick, cueBall, ballList, pocketList, striped):
     #TODO: targetBall and targetPocket are redunant
@@ -14,7 +16,7 @@ def hitTheBall(cueStick, cueBall, ballList, pocketList, striped):
     cueStick.setPower(power)
     cueStick.setAngle(angle)
     cueStick.hitCueBall(cueBall)
-    print(f"firing at: {pocketList.index(targetPocket)}")
+    # print(f"firing at: {pocketList.index(targetPocket)}")
 
 #TODO: really basic rn
 def determineBestBall(cueBall, ballList, pocketList, striped):
@@ -36,9 +38,6 @@ def determineBestBall(cueBall, ballList, pocketList, striped):
                     if not ballInPath(cueBall, targetPoint, ballList):
                         angle = determineBestAngle(ball, pocket, cueBall)
                         if possibleAngle(ball, cueBall, angle):
-                            print(f"angle in dbb: {angle} {possibleAngle(ball, cueBall, angle)}")
-                            print(f"pocket in dbb: {pocketList.index(pocket)}")
-
                             bestShots.append((ball, pocket, angle, determineBestPower(cueBall, ball, pocket)))
     
     #just hit the first legal ball
@@ -49,7 +48,6 @@ def determineBestBall(cueBall, ballList, pocketList, striped):
                 return (ball, pocketList[0], determineBestAngle(ball, pocketList[0], cueBall), 
                         determineBestPower(cueBall, ball, pocketList[0]))
     else:
-        #hit the first possible good hit
         print("not shit")
         bestAngle = 0
         bestShot = 0
@@ -59,10 +57,6 @@ def determineBestBall(cueBall, ballList, pocketList, striped):
             dyCTB = cueBall.posY - ball.posY
             dxCTB = cueBall.posX - ball.posX
             straightAngle = math.degrees(math.atan2(dyCTB, dxCTB))
-            print(f"{shot[1]}, {abs(angleDiff(angle, straightAngle))}")
-            # print(angle, straightAngle)
-            # print(f"angle diff1: {angleDiff(angle, straightAngle)}")
-            # print(f"angle diff2: {angleDiff(bestAngle, straightAngle)}")
             if abs(angleDiff(angle, straightAngle)) < abs(angleDiff(bestAngle, straightAngle)):
                 bestAngle = angle
                 bestShot = shot
@@ -104,8 +98,6 @@ def possibleAngle(ball, cueBall, angle):
     #TODO: hopefully angle1 and 2 shouldn't be flipped
     return angleInRange(angle, angle2 + buffer, angle1 - buffer) #hopefully angle1 and 2 shouldn't be flipped
 
-    # return (cartToPyX(pos1[0]), cartToPyY(pos1[1])), (cartToPyX(pos2[0]), cartToPyY(pos2[1]))
-
 #just wanted a quick and simple solution https://stackoverflow.com/questions/66799475/how-to-elegantly-find-if-an-angle-is-between-a-range
 def angleInRange(alpha, lower, upper):
     return (alpha - lower) % 360 <= (upper - lower) % 360
@@ -116,7 +108,6 @@ def angleDiff(angle1, angle2):
     return (a + 180) % 360 - 180
 
 
-#TODO: is it safe to assume the ball isnt moving?
 def determineBestAngle(ball, pocket, cueBall):
     """For a given ball, this function returns the best angle and velocity for 
         the cueBall to be shot at in order to the ball to be pocketed into a given
