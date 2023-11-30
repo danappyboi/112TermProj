@@ -27,6 +27,8 @@ class ball:
         self.posY = posY
 
     def legal(self, striped):
+        if striped == None:
+            return True
         return self.striped == striped and not self.cueBall and not self.ball8
 
 
@@ -71,9 +73,9 @@ class ball:
         
         wallFriction = .1
         if self.wallCollisionX():
-            self.setVelo((-self.velo[0] + sign(self.velo[0])*wallFriction, self.velo[1] + sign(self.velo[1])*wallFriction))
+            self.setVelo((-self.velo[0] - sign(self.velo[0])*wallFriction, self.velo[1] - sign(self.velo[1])*wallFriction))
         if self.wallCollisionY():
-            self.setVelo((self.velo[0] + sign(self.velo[0])*wallFriction, -self.velo[1] + sign(self.velo[1])*wallFriction))
+            self.setVelo((self.velo[0] - sign(self.velo[0])*wallFriction, -self.velo[1] - sign(self.velo[1])*wallFriction))
 
     #TODO: pretty ball with animations?
     def draw(self):
@@ -95,20 +97,20 @@ class ball:
 
     def wallCollisionX(self):
         """Determining whether or not the ball has collided with the left and right walls."""
-        if not (-tableWidth/2 <= self.posX - self.r):
+        if not (-tableWidth/2 < self.posX - self.r):
             self.posX = -tableWidth/2 + self.r
             return True
-        elif not (self.posX + self.r <= tableWidth/2):
+        elif not (self.posX + self.r < tableWidth/2):
             self.posX = tableWidth/2 - self.r
             return True
         return False
 
     def wallCollisionY(self):
         """Determining whether or not the ball has collided with the top and bottom walls."""
-        if not (tableHeight/2 >= self.posY + self.r):
+        if not (tableHeight/2 > self.posY + self.r):
             self.posY = tableHeight/2 - self.r
             return True
-        elif not (self.posY - self.r >= -tableHeight/2):
+        elif not (self.posY - self.r > -tableHeight/2):
             self.posY = -tableHeight/2 + self.r
             return True
         return False

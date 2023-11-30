@@ -8,6 +8,7 @@ import sys
 # import ballObj #would have done it the other way, but it makes writing code easier
 
 #TODO: still lk kinda inaccurate
+#TODO: account for balls inbetween target and pocket
 
 #TODO: think you could animate the way it moves?
 def hitTheBall(cueStick, cueBall, ballList, pocketList, striped):
@@ -34,8 +35,10 @@ def determineBestBall(cueBall, ballList, pocketList, striped):
                 hypoCueY = ball.posY + 2 * ball.r * math.sin(math.radians(angleToPocket))
 
                 targetPoint = (hypoCueX, hypoCueY)
+                pocketPoint = (pyToCartX(pocket[0]), pyToCartY(pocket[1]))
                 if cueBallInPosition(cueBall, targetPoint, pocket):
-                    if not ballInPath(cueBall, targetPoint, ballList):
+                    #TODO: i dont think the second one is working
+                    if not ballInPath(cueBall, targetPoint, ballList) and not ballInPath(ball, pocketPoint, ballList):
                         angle = determineBestAngle(ball, pocket, cueBall)
                         if possibleAngle(ball, cueBall, angle):
                             bestShots.append((ball, pocket, angle, determineBestPower(cueBall, ball, pocket)))
@@ -63,7 +66,44 @@ def determineBestBall(cueBall, ballList, pocketList, striped):
                 
         return bestShot
 
-            
+def scratch(app, cueBall, ballList, pocketList, striped):
+    bigFlag = False
+    for ball in ballList:
+        if ball.legal(striped):
+            for pocket in pocketList:
+                # cartPocket = (pyToCartX(pocket[0]), pyToCartY(pocket[1]))
+
+                dxBTP = ball.posX - pyToCartX(pocket[0])
+                dyBTP = ball.posY - pyToCartY(pocket[1])
+
+                angleToPocket = math.degrees(math.atan2(dyBTP,dxBTP))
+
+                preferredDistToCue = 10
+                hypoCueX = ball.posX + ((2 * ball.r) + preferredDistToCue) * math.cos(math.radians(angleToPocket))
+                hypoCueY = ball.posY + ((2 * ball.r) + preferredDistToCue) * math.sin(math.radians(angleToPocket))
+
+                # if not ballInPath(cueBall, targetPoint, ballList) and not ballInPath(ball, pocketPoint, ballList):
+                flag = False
+                for otherBall in ballList:
+                    if ball == otherBall or ball.cueBall:
+                        continue
+                    print(f"now im here: {ball, otherBall}")
+                    if distance(otherBall.posX, otherBall.posY, hypoCueX, hypoCueY) < 2*ball.r:
+                        flag = True
+                        break
+                if flag == False:
+                    print("yay, we did it")
+                    return (hypoCueX, hypoCueY, ball, pocket)
+        if bigFlag == True:
+            break
+    if bigFlag == False:
+        print("whoops")
+        return (0, 0, ballList[0], pocketList[0])
+
+
+
+
+
 def cueBallInPosition(cueBall, targetPoint, pocket):
     minX = min(targetPoint[0], pyToCartX(pocket[0]))
     maxX = max(targetPoint[0], pyToCartX(pocket[0]))
@@ -139,7 +179,7 @@ def ballInPath(cueBall, targetPoint, ballList):
     """Determines whether or not a ball is in the path of the cueBall 
         and a given targetPoint"""
     for ball in ballList:
-        if (ball != cueBall):
+        if (ball != cueBall) and not (ball.posX == targetPoint[0] and ball.posY == targetPoint[1]):
             perpPoint = perpendPointOnLine(cueBall, targetPoint, ball)
             if distance(ball.posX, ball.posY, perpPoint[0], perpPoint[1]) <= 2* ball.r:
                 minBallX = min(targetPoint[0], cueBall.posX)
