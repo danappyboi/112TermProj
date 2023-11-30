@@ -23,10 +23,13 @@ class ball:
         self.ball8 = ball8
 
     def setPos(self, posX, posY):
+        """Sets the x and y positions."""
         self.posX = posX
         self.posY = posY
 
     def legal(self, striped):
+        """Checks if the ball is playable based on the strip
+        and whether or not its an 8ball/cueball"""
         if striped == None:
             return True
         return self.striped == striped and not self.cueBall and not self.ball8

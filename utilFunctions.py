@@ -23,6 +23,7 @@ def rotateAlgo(velo, angle):
     return (math.cos(angle) * velo[0] + math.sin(angle) * velo[1]),(-math.sin(angle) * velo[0] + math.cos(angle) * velo[1])
 
 def revertAlgo(velo, angle):
+    """A matrix I learned in 21-241 that finds the x,y of a point that has been rotated."""
     return (math.cos(angle) * velo[0] - math.sin(angle) * velo[1]),(math.sin(angle) * velo[0] + math.cos(angle) * velo[1])
 
 def dot(v1, v2):

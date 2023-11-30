@@ -1,10 +1,6 @@
 from cmu_graphics import*
 import math
 from utilFunctions import*
-from cueStick import cueStickObj
-from gameElements import setVeloAfterCollision
-import copy
-import sys
 # import ballObj #would have done it the other way, but it makes writing code easier
 
 #TODO: still lk kinda inaccurate
@@ -12,6 +8,7 @@ import sys
 
 #TODO: think you could animate the way it moves?
 def hitTheBall(cueStick, cueBall, ballList, pocketList, striped):
+    """Hits the ball based on the determineBestBall function."""
     #TODO: targetBall and targetPocket are redunant
     targetBall, targetPocket, angle, power = determineBestBall(cueBall, ballList, pocketList, striped)
     cueStick.setPower(power)
@@ -21,6 +18,7 @@ def hitTheBall(cueStick, cueBall, ballList, pocketList, striped):
 
 #TODO: really basic rn
 def determineBestBall(cueBall, ballList, pocketList, striped):
+    """Determines the best ball and angle to hit based on the position of the cueBall and the options."""
     bestShots = []
 
     for ball in ballList: 
@@ -31,11 +29,14 @@ def determineBestBall(cueBall, ballList, pocketList, striped):
 
                 angleToPocket = math.degrees(math.atan2(dyBTP,dxBTP))
 
+                """hypoCue represents the position of the best ball placement based on the pocket"""
                 hypoCueX = ball.posX + 2 * ball.r * math.cos(math.radians(angleToPocket))
                 hypoCueY = ball.posY + 2 * ball.r * math.sin(math.radians(angleToPocket))
 
                 targetPoint = (hypoCueX, hypoCueY)
                 pocketPoint = (pyToCartX(pocket[0]), pyToCartY(pocket[1]))
+
+                """Just a bunch of checks to make sure this is a possible shot."""
                 if cueBallInPosition(cueBall, targetPoint, pocket):
                     #TODO: i dont think the second one is working
                     if not ballInPath(cueBall, targetPoint, ballList) and not ballInPath(ball, pocketPoint, ballList):
@@ -43,17 +44,18 @@ def determineBestBall(cueBall, ballList, pocketList, striped):
                         if possibleAngle(ball, cueBall, angle):
                             bestShots.append((ball, pocket, angle, determineBestPower(cueBall, ball, pocket)))
     
-    #just hit the first legal ball
+    """If there's no good shots, just hit the first ball in the ballList."""
     if bestShots == []:
         for ball in ballList:
             if ball.legal(striped):
-                print("shit.")
+                print("shit.") #tests for me
                 return (ball, pocketList[0], determineBestAngle(ball, pocketList[0], cueBall), 
                         determineBestPower(cueBall, ball, pocketList[0]))
     else:
-        print("not shit")
+        print("not shit") #tests for me
         bestAngle = 0
         bestShot = 0
+        """Out of the best shots, pick the shot that is the closest to just hitting the ball straight on."""
         for shot in bestShots:
             angle = shot[2]
             ball = shot[0]
@@ -67,11 +69,12 @@ def determineBestBall(cueBall, ballList, pocketList, striped):
         return bestShot
 
 def scratch(app, cueBall, ballList, pocketList, striped):
+    """Returns new cueBall positions and the angle and ball to aim for after a scratch. 
+        Just picks the first shot that is straight on from a specfic distance away."""
     bigFlag = False
     for ball in ballList:
         if ball.legal(striped):
             for pocket in pocketList:
-                # cartPocket = (pyToCartX(pocket[0]), pyToCartY(pocket[1]))
 
                 dxBTP = ball.posX - pyToCartX(pocket[0])
                 dyBTP = ball.posY - pyToCartY(pocket[1])
@@ -79,37 +82,40 @@ def scratch(app, cueBall, ballList, pocketList, striped):
                 angleToPocket = math.degrees(math.atan2(dyBTP,dxBTP))
 
                 preferredDistToCue = 10
+                """Where the cueBall will hypothetically be at the shot."""
                 hypoCueX = ball.posX + ((2 * ball.r) + preferredDistToCue) * math.cos(math.radians(angleToPocket))
                 hypoCueY = ball.posY + ((2 * ball.r) + preferredDistToCue) * math.sin(math.radians(angleToPocket))
 
                 # if not ballInPath(cueBall, targetPoint, ballList) and not ballInPath(ball, pocketPoint, ballList):
+                """Making sure there isn't a ball in hypoCue position."""
                 flag = False
                 for otherBall in ballList:
                     if ball == otherBall or ball.cueBall:
                         continue
-                    print(f"now im here: {ball, otherBall}")
                     if distance(otherBall.posX, otherBall.posY, hypoCueX, hypoCueY) < 2*ball.r:
                         flag = True
                         break
                 if flag == False:
-                    print("yay, we did it")
                     return (hypoCueX, hypoCueY, ball, pocket)
         if bigFlag == True:
             break
+    """If we went through every possible ball and pocket and didn't find a shot, just shoot 
+        at the first ball at the 0th hole from (0,0)."""
     if bigFlag == False:
         print("whoops")
         return (0, 0, ballList[0], pocketList[0])
 
 
-
-
-
 def cueBallInPosition(cueBall, targetPoint, pocket):
+    """Checking to make sure the cueBall is in a position to actually hit the ball at the pocket."""
+
     minX = min(targetPoint[0], pyToCartX(pocket[0]))
     maxX = max(targetPoint[0], pyToCartX(pocket[0]))
     minY = min(targetPoint[1], pyToCartY(pocket[1]))
     maxY = max(targetPoint[1], pyToCartY(pocket[1]))
 
+    """The cueBall has to be behind the target in order to shoot it, if its anywhere in front, its 
+        a terrible shot."""
     if (minX < cueBall.posX < maxX) or (minY < cueBall.posY < maxY):
         return False
     return True
@@ -120,13 +126,17 @@ def possibleAngle(ball, cueBall, angle):
     dyBTC = ball.posY - cueBall.posY
 
     angleBTC = math.atan2(dyBTC, dxBTC)
+
+    """Using Lin Alg, find the points where the cueBall would juuuuust graze the 
+        target."""
     pos1 = revertAlgo((0, 2 * ball.r), angleBTC)
     pos2 = revertAlgo((0, -2*ball.r), angleBTC)
     pos1 = add(pos1, (ball.posX, ball.posY))
     pos2 = add(pos2, (ball.posX, ball.posY))
 
-    buffer = 1
     """Buffer angle to make sure it doesn't take crazy 90° shots"""
+    buffer = 1
+    
     dxCTPos1 = cueBall.posX - pos1[0]
     dyCTPos1 = cueBall.posY - pos1[1]
     angle1 = math.degrees(math.atan2(dyCTPos1, dxCTPos1))
@@ -134,8 +144,9 @@ def possibleAngle(ball, cueBall, angle):
     dyCTPos2 = cueBall.posY - pos2[1]
     angle2 = math.degrees(math.atan2(dyCTPos2, dxCTPos2))
 
-    # print(f"angles in question: {angle1} {angle2}")
-    #TODO: hopefully angle1 and 2 shouldn't be flipped
+    """angle1 and angle2 are the angle the cueBall would have to take to make
+        the crazy shots. If the ball isn't in the range of grazing the ball, 
+        its definitely not a good shot."""
     return angleInRange(angle, angle2 + buffer, angle1 - buffer) #hopefully angle1 and 2 shouldn't be flipped
 
 #just wanted a quick and simple solution https://stackoverflow.com/questions/66799475/how-to-elegantly-find-if-an-angle-is-between-a-range
@@ -158,9 +169,11 @@ def determineBestAngle(ball, pocket, cueBall):
 
     angleToPocket = math.degrees(math.atan2(dyBTP,dxBTP))
 
+    """hypoCue is the ideal position for the cueBall to collide with the ball at."""
     hypoCueX = ball.posX + 2 * ball.r * math.cos(math.radians(angleToPocket))
     hypoCueY = ball.posY + 2 * ball.r * math.sin(math.radians(angleToPocket))
 
+    """Just return the angle the cueBall needs to take to get to hypoCue."""
     angleHypoCueToCue = math.degrees(math.atan2(cueBall.posY - hypoCueY,
                                                 cueBall.posX - hypoCueX))
     return angleHypoCueToCue
@@ -170,9 +183,10 @@ def determineBestPower(cueBall, ball, pocket):
     distBTP = distance(ball.posX, ball.posY, pyToCartX(pocket[0]), pyToCartY(pocket[1]))
     distBTC = distance(cueBall.posX, cueBall.posY, ball.posX, ball.posY)
 
+    #TODO: gotta make it make sense
+    """literally no rhyme or reason for this value, just works well enough"""
     val = 2 * ((distBTC + distBTP)/47.5 + 2) 
-    #literally no rhyme or reason for this value, 
-    #just works well enough
+
     return val
 
 def ballInPath(cueBall, targetPoint, ballList):
@@ -181,6 +195,9 @@ def ballInPath(cueBall, targetPoint, ballList):
     for ball in ballList:
         if (ball != cueBall) and not (ball.posX == targetPoint[0] and ball.posY == targetPoint[1]):
             perpPoint = perpendPointOnLine(cueBall, targetPoint, ball)
+            """First, check if the ball is in the line of shot, if it does,
+                check that its ACTUALLY in the line of the shot, and not 
+                behind it."""
             if distance(ball.posX, ball.posY, perpPoint[0], perpPoint[1]) <= 2* ball.r:
                 minBallX = min(targetPoint[0], cueBall.posX)
                 maxBallX = max(targetPoint[0], cueBall.posX)
@@ -207,6 +224,16 @@ def perpendPointOnLine(cueBall, targetPoint, ball):
     else:
         invSlope = 1/slope
 
+    """The cueBall to targetPoint creates a line, and we want to find the
+    perpendicular line that goes through the ball. This is basically a algebra
+    1 problem with two equations, meaning we can chuck the slopes of the equations
+    into a matrix. 
+    [  slope     -1][ x ] = [b1]
+    [-1/slope    -1][ y ] = [b2]  
+
+    Using https://matrixcalc.org/ to find the inverse, we can find the x and y
+    coords of point that makes a perpendicular line that goes through the ball.
+    """
     invMat = [[slope/(slope**2+1), -slope/(slope**2+1)],
               [-1/(slope**2+1), -(slope**2)/(slope**2+1)]]
     bVec = [-targetPoint[0]+slope*targetPoint[1], 

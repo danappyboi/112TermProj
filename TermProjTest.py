@@ -31,10 +31,10 @@ def onAppStart(app):
     app.ballList = copy.copy(app.initalBallList)
 
     app.player1 = player("Player 1")
-    app.player2 = player("AI")
+    app.AIPlayer = player("AI")
     app.player1.turn = True
 
-    app.playerList = [app.player1, app.player2] #TODO: kinda don't like this implementation
+    app.playerList = [app.player1, app.AIPlayer] #TODO: kinda don't like this implementation
     app.nonStripedBalls = []
     app.stripedBalls = []
 
@@ -64,7 +64,7 @@ def redrawAll(app):
     
     gameElements.drawPowerBar(app.width/2, app.height - 35, app.cueStick.distFromBall)
 
-    gameElements.drawPlayerHuds(app.player1, app.player2)
+    gameElements.drawPlayerHuds(app.player1, app.AIPlayer)
 
 
 
@@ -119,13 +119,13 @@ def onKeyPress(app, key):
         #         app.cueBall.pocketed = False
         #         if app.cueBall not in app.ballList:
         #             app.ballList.append(app.cueBall)
-        #         app.cueBall.posX, app.cueBall.posY, targetBall, targetPocket = ai.scratch(app, app.cueBall, app.ballList, app.pockets, app.player2.striped)
+        #         app.cueBall.posX, app.cueBall.posY, targetBall, targetPocket = ai.scratch(app, app.cueBall, app.ballList, app.pockets, app.AIPlayer.striped)
         #         app.cueStick.setPower(ai.determineBestPower(app.cueBall, targetBall, targetPocket))
         #         app.cueStick.setAngle(ai.determineBestAngle(targetBall, targetPocket, app.cueBall))
         #         app.cueStick.hitCueBall(app.cueBall)
         #         app.scratch = False
         #     else:
-        #         ai.hitTheBall(app.cueStick, app.cueBall, app.ballList, app.pockets, app.player2.striped)
+        #         ai.hitTheBall(app.cueStick, app.cueBall, app.ballList, app.pockets, app.AIPlayer.striped)
         #     app.playing = False
     
 
@@ -137,25 +137,26 @@ def onKeyHold(app, keys):
             app.cueStick.addPower(3)
 
 def onStep(app):
-    if app.playing and app.player2.turn:
+    if app.playing and app.AIPlayer.turn:
         if app.scratch:
             app.cueBall.setVelo((0,0))
             app.cueBall.pocketed = False
             if app.cueBall not in app.ballList:
                 app.ballList.append(app.cueBall)
-            app.cueBall.posX, app.cueBall.posY, targetBall, targetPocket = ai.scratch(app, app.cueBall, app.ballList, app.pockets, app.player2.striped)
+            app.cueBall.posX, app.cueBall.posY, targetBall, targetPocket = ai.scratch(app, app.cueBall, app.ballList, app.pockets, app.AIPlayer.striped)
             app.cueStick.setPower(ai.determineBestPower(app.cueBall, targetBall, targetPocket))
             app.cueStick.setAngle(ai.determineBestAngle(targetBall, targetPocket, app.cueBall))
             app.cueStick.hitCueBall(app.cueBall)
             app.scratch = False
         else:
-            ai.hitTheBall(app.cueStick, app.cueBall, app.ballList, app.pockets, app.player2.striped)
+            ai.hitTheBall(app.cueStick, app.cueBall, app.ballList, app.pockets, app.AIPlayer.striped)
         app.playing = False
 
     if not app.playing:
         gameElements.checkBallCollisions(app.ballList)
         gameElements.checkingPockets(app.ballList, app.pockets, app.stripedBalls, app.nonStripedBalls)
 
+        #If the first ball has been pocketed, the stripe goes to the player
         if not app.firstBallPocketed:
             for ball in app.initalBallList:
                 if not ball.ball8 and not ball.cueBall:
@@ -170,9 +171,9 @@ def onStep(app):
             
         if gameElements.ballsStopped(app.ballList):
             if app.player1.turn: 
-                gameElements.turnLogic(app, app.player1, app.player2, app.stripedBalls, app.nonStripedBalls, app.cueBall)
+                gameElements.turnLogic(app, app.player1, app.AIPlayer, app.stripedBalls, app.nonStripedBalls, app.cueBall)
             else:
-                gameElements.turnLogic(app, app.player2, app.player1, app.stripedBalls, app.nonStripedBalls, app.cueBall)
+                gameElements.turnLogic(app, app.AIPlayer, app.player1, app.stripedBalls, app.nonStripedBalls, app.cueBall)
             app.playing = True  
 
 def main():
