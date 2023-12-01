@@ -8,6 +8,7 @@ from player import player
 import ai
 import ballPositions
 import copy
+from button import button
 
 #TODO: fix going too fast
 #TODO: resize...?
@@ -34,7 +35,6 @@ def onAppStart(app):
     app.AIPlayer = player("AI")
     app.player1.turn = True
     
-
     app.playerList = [app.player1, app.AIPlayer] #TODO: kinda don't like this implementation
     app.nonStripedBalls = []
     app.stripedBalls = []
@@ -45,7 +45,9 @@ def onAppStart(app):
     app.firstBallPocketed = False
     app.ballTouched = False
     app.scratch = False
-    app.gameOver = False    
+    app.gameOver = False
+
+    app.button1 = button(app.width/2, app.height/2, 200, 100)
 
     # app.cueTestImage = CMUImage("image/cueBall.png", width=100, height=100)
 
@@ -74,7 +76,8 @@ def redrawAll(app):
 
     if app.gameOver == True:
         drawLabel("GAME OVER", app.width/2, app.height/2, size=60, font="orbitron", bold = True,fill='red')
-    # drawImage(app.cueTestImage, 100, 100, align="center")
+
+    app.button1.drawButtonGraphic("Did it work?")
 
 
 
@@ -113,6 +116,8 @@ def onMousePress(app, mouseX, mouseY):
             if app.player1.turn:
                 if app.scratch:
                     app.scratch = False
+    if app.button1.clicked(mouseX, mouseY):
+        print("clicked")
 
 def onKeyPress(app, key):
     if not app.gameOver:
