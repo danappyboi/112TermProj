@@ -44,27 +44,28 @@ def determineBestBall(cueBall, ballList, pocketList, striped):
                         if possibleAngle(ball, cueBall, angle):
                             bestShots.append((ball, pocket, angle, determineBestPower(cueBall, ball, pocket)))
 
-    if only8BallLeft(ballList, striped) != False:
-        ball8 = only8BallLeft(ballList, striped)
-        for pocket in pocketList:
-            dx8TP = ball8.posX - pyToCartX(pocket[0])
-            dy8TP = ball8.posY - pyToCartY(pocket[1])
+    if bestShots == []:
+        if only8BallLeft(ballList, striped) != False:
+            ball8 = only8BallLeft(ballList, striped)
+            for pocket in pocketList:
+                dx8TP = ball8.posX - pyToCartX(pocket[0])
+                dy8TP = ball8.posY - pyToCartY(pocket[1])
 
-            angleToPocket = math.degrees(math.atan2(dy8TP,dx8TP))
+                angleToPocket = math.degrees(math.atan2(dy8TP,dx8TP))
 
-            """hypoCue represents the position of the best ball placement based on the pocket"""
-            hypoCueX = ball8.posX + 2 * ball8.r * math.cos(math.radians(angleToPocket))
-            hypoCueY = ball8.posY + 2 * ball8.r * math.sin(math.radians(angleToPocket))
+                """hypoCue represents the position of the best ball placement based on the pocket"""
+                hypoCueX = ball8.posX + 2 * ball8.r * math.cos(math.radians(angleToPocket))
+                hypoCueY = ball8.posY + 2 * ball8.r * math.sin(math.radians(angleToPocket))
 
-            targetPoint = (hypoCueX, hypoCueY)
-            pocketPoint = (pyToCartX(pocket[0]), pyToCartY(pocket[1]))
+                targetPoint = (hypoCueX, hypoCueY)
+                pocketPoint = (pyToCartX(pocket[0]), pyToCartY(pocket[1]))
 
-            if cueBallInPosition(cueBall, targetPoint, pocket):
-                #TODO: i dont think the second one is working
-                    if not ballInPath(cueBall, targetPoint, ballList) and not ballInPath(ball8, pocketPoint, ballList):
-                        angle = determineBestAngle(ball8, pocket, cueBall)
-                        if possibleAngle(ball8, cueBall, angle):
-                            bestShots.append((ball8, pocket, angle, determineBestPower(cueBall, ball8, pocket)))
+                if cueBallInPosition(cueBall, targetPoint, pocket):
+                    #TODO: i dont think the second one is working
+                        if not ballInPath(cueBall, targetPoint, ballList) and not ballInPath(ball8, pocketPoint, ballList):
+                            angle = determineBestAngle(ball8, pocket, cueBall)
+                            if possibleAngle(ball8, cueBall, angle):
+                                bestShots.append((ball8, pocket, angle, determineBestPower(cueBall, ball8, pocket)))
 
     
     """If there's no good shots, just hit the first ball in the ballList."""
@@ -118,17 +119,17 @@ def scratch(app, cueBall, ballList, pocketList, striped):
                 hypoCueX = ball.posX + ((2 * ball.r) + preferredDistToCue) * math.cos(math.radians(angleToPocket))
                 hypoCueY = ball.posY + ((2 * ball.r) + preferredDistToCue) * math.sin(math.radians(angleToPocket))
 
-                # if not ballInPath(cueBall, targetPoint, ballList) and not ballInPath(ball, pocketPoint, ballList):
-                """Making sure there isn't a ball in hypoCue position."""
-                flag = False
-                for otherBall in ballList:
-                    if ball == otherBall or ball.cueBall:
-                        continue
-                    if distance(otherBall.posX, otherBall.posY, hypoCueX, hypoCueY) < 2*ball.r:
-                        flag = True
-                        break
-                if flag == False:
-                    return (hypoCueX, hypoCueY, ball, pocket)
+                if not ballInPath(cueBall, (hypoCueX, hypoCueY), ballList) and not ballInPath(ball, (pocket[0], pocket[1]), ballList):
+                    """Making sure there isn't a ball in hypoCue position."""
+                    flag = False
+                    for otherBall in ballList:
+                        if ball == otherBall or ball.cueBall:
+                            continue
+                        if distance(otherBall.posX, otherBall.posY, hypoCueX, hypoCueY) < 2*ball.r:
+                            flag = True
+                            break
+                    if flag == False:
+                        return (hypoCueX, hypoCueY, ball, pocket)
         if bigFlag == True:
             break
     """If we went through every possible ball and pocket and didn't find a shot, just shoot 
@@ -230,7 +231,7 @@ def ballInPath(cueBall, targetPoint, ballList):
             """First, check if the ball is in the line of shot, if it does,
                 check that its ACTUALLY in the line of the shot, and not 
                 behind it."""
-            if distance(ball.posX, ball.posY, perpPoint[0], perpPoint[1]) <= 2* ball.r:
+            if distance(ball.posX, ball.posY, perpPoint[0], perpPoint[1]) < 2* (ball.r + 2): #the two is for buffer
                 minBallX = min(targetPoint[0], cueBall.posX)
                 maxBallX = max(targetPoint[0], cueBall.posX)
                 minBallY = min(targetPoint[1], cueBall.posY)
@@ -268,8 +269,8 @@ def perpendPointOnLine(cueBall, targetPoint, ball):
     """
     invMat = [[slope/(slope**2+1), -slope/(slope**2+1)],
               [-1/(slope**2+1), -(slope**2)/(slope**2+1)]]
-    bVec = [-targetPoint[0]+slope*targetPoint[1], 
-            -ball.posY + -(invSlope)*ball.posX]
+    bVec = [-targetPoint[1]+slope*targetPoint[0], 
+            -ball.posY + (-invSlope)*ball.posX]
     
     pointX = (invMat[0][0] * bVec[0] + invMat[0][1] * bVec[1])
     pointY = (invMat[1][0] * bVec[0] + invMat[1][1] * bVec[1])

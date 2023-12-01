@@ -109,7 +109,7 @@ def checkWin(app, ball8, playerList):
     if ball8.pocketed == True:
         for i in range(2):
             if playerList[i].turn:
-                app.gameOver
+                app.gameOver = True
                 if len(playerList[i].pocketed) == 8:
                     print("ding ding ding")
                 else:
@@ -121,13 +121,15 @@ def checkWin(app, ball8, playerList):
 #TODO: wack implementation
 #TODO: gotta add something for not hitting any balls (remembering the position of all the balls?)
 #TODO: bruh, what if the person hits the other person balls? Now you gotta rember the first ball hit
-def turnLogic(app, turnPlayer, otherPlayer, stripedBalls, nonStripedBalls, cueBall, ballTouched):
+def turnLogic(app, turnPlayer, otherPlayer, stripedBalls, nonStripedBalls, ball8, cueBall, ballTouched):
     """Based on the player whose turn it is, this function adds their pocketed balls
         and determines the next turn."""
+    # if ball8.pocketed == True:
+    #     app.gameOver = True
     if cueBall.pocketed == True:
-            app.scratch = True
-            turnPlayer.turn = False
-            otherPlayer.turn = True
+        app.scratch = True
+        turnPlayer.turn = False
+        otherPlayer.turn = True
     elif ballTouched == False:
         app.scratch = True
         turnPlayer.turn = False
@@ -166,13 +168,23 @@ def testStriped(player):
         return "white"
 
 def drawPlayerHuds(player1, player2):
-    """Draws player1 pocket for HUD."""
+    """Draws the HUDS for the players."""
     leftCenter = (width - tableWidth)/4
     rightCenter = (width - tableWidth)/2 + tableWidth + leftCenter
-    drawRect(leftCenter, height/2, leftCenter*2-50, tableHeight-20, align="center", border="white", fill=rgb(50,50,50), opacity=40)
-    drawRect(rightCenter, height/2, leftCenter*2-50, tableHeight-20, align="center", border="white", fill=rgb(50,50,50), opacity=40)
-    drawLabel(f"{player1.name}'s Pocketed Balls", leftCenter, 100, fill=testStriped(player1), size=11, bold=player1.turn)
-    drawLabel(f"{player2.name}'s Pocketed Balls", rightCenter, 100, fill=testStriped(player2), size=11, bold=player2.turn)
+
+    if player1.turn:
+        leftBorderThickness = 4
+    else:
+        leftBorderThickness = 1
+    if player2.turn:
+        rightBorderThickness = 4
+    else:
+        rightBorderThickness = 1
+
+    drawRect(leftCenter, height/2, leftCenter*2-50, tableHeight-20, align="center", border="white", borderWidth = leftBorderThickness, fill=rgb(50,50,50), opacity=40)
+    drawRect(rightCenter, height/2, leftCenter*2-50, tableHeight-20, align="center", border="white", borderWidth = rightBorderThickness, fill=rgb(50,50,50), opacity=40)
+    drawLabel(f"{player1.name}'s Pocketed Balls", leftCenter, 100, fill=testStriped(player1), font="orbitron", size=10, bold=player1.turn)
+    drawLabel(f"{player2.name}'s Pocketed Balls", rightCenter, 100, fill=testStriped(player2),font="orbitron", size=11, bold=player2.turn)
     for i in range(len(player1.pocketed)):
         ball = player1.pocketed[i]
         ball.drawStatic(leftCenter, 150 + i * 40)

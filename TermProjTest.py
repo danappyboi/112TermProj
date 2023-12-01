@@ -58,6 +58,7 @@ def redrawAll(app):
         drawCircle(app.pockets[i][0], app.pockets[i][1], 12, fill="black")
         drawLabel(i,app.pockets[i][0], app.pockets[i][1], size=15,fill="white")
 
+    # print(ai.ballInPath(app, app.cueBall, (app.blueStriped.posX, app.blueStriped.posY), app.ballList))
     # drawing the ball
     for ball in app.ballList:
         ball.draw()
@@ -187,9 +188,9 @@ def onStep(app):
             if gameElements.ballsStopped(app.ballList):
                 gameElements.checkWin(app, app.ball8, app.playerList)
                 if app.player1.turn: 
-                    gameElements.turnLogic(app, app.player1, app.AIPlayer, app.stripedBalls, app.nonStripedBalls, app.cueBall, app.ballTouched)
+                    gameElements.turnLogic(app, app.player1, app.AIPlayer, app.stripedBalls, app.nonStripedBalls, app.ball8, app.cueBall, app.ballTouched)
                 else:
-                    gameElements.turnLogic(app, app.AIPlayer, app.player1, app.stripedBalls, app.nonStripedBalls, app.cueBall, app.ballTouched)
+                    gameElements.turnLogic(app, app.AIPlayer, app.player1, app.stripedBalls, app.nonStripedBalls, app.ball8, app.cueBall, app.ballTouched)
                 app.playing = True  
                 app.ballTouched = False
 

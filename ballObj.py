@@ -31,8 +31,8 @@ class ball:
         """Checks if the ball is playable based on the strip
         and whether or not its an 8ball/cueball"""
         if striped == None:
-            return True
-        return self.striped == striped and not self.cueBall and not self.ball8
+            return (not self.cueBall and not self.ball8)
+        return self.striped == striped
 
 
     def setVelo(self, velo):
