@@ -10,7 +10,7 @@ tableHeight = 450
 
 class ball:
     """The ball object. Has a x, y, color, and velocity. Used for all the balls and the cueball."""
-    def __init__(self, posX, posY, color, striped=False, velo=(0,0), r=8, cueBall=False, ball8=False):
+    def __init__(self, posX, posY, color, striped=False, velo=(0,0), r=10, cueBall=False, ball8=False):
         self.posX = posX
         self.posY = posY
         self.color = color
@@ -85,18 +85,20 @@ class ball:
         self.runVelo()
         x = cartToPyX(self.posX)
         y = cartToPyY(self.posY)
-        drawCircle(x+1, y+1, self.r +1, fill=rgb(30, 30, 30), opacity=30)
-        drawCircle(x, y, self.r, fill=self.color)
-        drawCircle(x - 3, y - 3, 2, fill="white", opacity=70)
+        # drawCircle(x+1, y+1, self.r +1, fill=rgb(30, 30, 30), opacity=30)
+        # drawCircle(x, y, self.r, fill=self.color)
+        # drawCircle(x - 3, y - 3, 2, fill="white", opacity=70)
+        drawImage(self.color, x, y, align="center")
 
         # arrowMag = 8
         # drawLine(x, y, x + self.velo[0]* arrowMag, y - self.velo[1]* arrowMag, lineWidth = 3, arrowEnd=True, fill=self.color)
 
     def drawStatic(self, x, y):
         """Draws a static version of the ball. Could be changed later."""
-        drawCircle(x+1, y+1, self.r +1, fill=rgb(30, 30, 30), opacity=30)
-        drawCircle(x, y, self.r, fill=self.color)
-        drawCircle(x - 3, y - 3, 2, fill="white", opacity=70)
+        # drawCircle(x+1, y+1, self.r +1, fill=rgb(30, 30, 30), opacity=30)
+        # drawCircle(x, y, self.r, fill=self.color)
+        # drawCircle(x - 3, y - 3, 2, fill="white", opacity=70)
+        drawImage(self.color, x, y, align="center")
 
     def wallCollisionX(self):
         """Determining whether or not the ball has collided with the left and right walls."""

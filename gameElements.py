@@ -87,7 +87,7 @@ def checkingPockets(ballList, pocketList, stripedList, nonStripedList):
     """Checks if any balls have been pocketed and places them in the correct player's pocketed list."""
     for ball in ballList:
         for pocket in pocketList:
-            if distance(cartToPyX(ball.posX), cartToPyY(ball.posY), pocket[0], pocket[1]) < 10:
+            if distance(cartToPyX(ball.posX), cartToPyY(ball.posY), pocket[0], pocket[1]) < 12:
                 ball.pocketed = True
                 ballList.remove(ball)
                 
