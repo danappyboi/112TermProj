@@ -4,7 +4,6 @@ from utilFunctions import*
 # import ballObj #would have done it the other way, but it makes writing code easier
 
 #TODO: still lk kinda inaccurate
-#TODO: account for balls inbetween target and pocket
 
 #TODO: think you could animate the way it moves?
 def hitTheBall(cueStick, cueBall, ballList, pocketList, striped):
@@ -16,7 +15,6 @@ def hitTheBall(cueStick, cueBall, ballList, pocketList, striped):
     cueStick.hitCueBall(cueBall)
     # print(f"firing at: {pocketList.index(targetPocket)}")
 
-#TODO: really basic rn
 def determineBestBall(cueBall, ballList, pocketList, striped):
     """Determines the best ball and angle to hit based on the position of the cueBall and the options."""
     bestShots = []
@@ -38,7 +36,6 @@ def determineBestBall(cueBall, ballList, pocketList, striped):
 
                 """Just a bunch of checks to make sure this is a possible shot."""
                 if cueBallInPosition(cueBall, targetPoint, pocket):
-                    #TODO: i dont think the second one is working
                     if not ballInPath(cueBall, targetPoint, ballList) and not ballInPath(ball, pocketPoint, ballList):
                         angle = determineBestAngle(ball, pocket, cueBall)
                         if possibleAngle(ball, cueBall, angle):
@@ -101,7 +98,7 @@ def only8BallLeft(ballList, striped):
             return ballList[i]
 
 
-def scratch(app, cueBall, ballList, pocketList, striped):
+def scratch(cueBall, ballList, pocketList, striped):
     """Returns new cueBall positions and the angle and ball to aim for after a scratch. 
         Just picks the first shot that is straight on from a specfic distance away."""
     bigFlag = False

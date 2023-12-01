@@ -9,7 +9,6 @@ import ai
 import ballPositions
 import copy
 
-#TODO: balls keep running against the wall and stopping play of game. mouse?
 #TODO: fix going too fast
 #TODO: resize...?
 
