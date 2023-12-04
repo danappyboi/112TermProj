@@ -9,6 +9,7 @@ import ai
 import ballPositions
 import copy
 from button import button
+import menu
 
 #TODO: fix going too fast
 #TODO: resize...?
@@ -45,9 +46,21 @@ def onAppStart(app):
     app.firstBallPocketed = False
     app.ballTouched = False
     app.scratch = False
-    app.gameOver = False
+    app.gameOver = True
+    app.menu = True
 
-    app.button1 = button(app.width/2, app.height/2, 200, 100)
+    app.playButton = button(app.width/2, app.height/2 - 100, 250, 100)
+    app.chooseMode = False
+    app.instructionsButton = button(app.width/2, app.height/2 + 25, 200, 75)
+    app.instructions = False
+    app.optionsButton = button(app.width/2, app.height/2 + 125, 200, 75)
+    app.options = False
+    app.backButton = button(app.width/2 - 225, 100, 50, 50)
+    app.backButton.visible = False
+    app.twoPlayerButton = button(app.width/2 - 125, app.height/2, 200, 75)
+    app.twoPlayerButton.visible = False
+    app.AIButton = button(app.width/2 + 125, app.height/2, 200, 75)
+    app.AIButton.visible = False
 
     # app.cueTestImage = CMUImage("image/cueBall.png", width=100, height=100)
 
@@ -74,10 +87,17 @@ def redrawAll(app):
 
     gameElements.drawPlayerHuds(app.player1, app.AIPlayer)
 
-    if app.gameOver == True:
+    if app.gameOver and not app.menu:
         drawLabel("GAME OVER", app.width/2, app.height/2, size=60, font="orbitron", bold = True,fill='red')
 
-    # app.button1.drawButtonGraphic("Did it work?")
+    app.playButton.drawButtonGraphic("Play")
+    app.instructionsButton.drawButtonGraphic("Instructions")
+    app.optionsButton.drawButtonGraphic("Options")
+    app.backButton.drawButtonGraphic("←")
+    app.twoPlayerButton.drawButtonGraphic("Two Player")
+    app.AIButton.drawButtonGraphic("AI Mode")
+
+    menu.draw(app, app.chooseMode, app.instructions, app.options)
 
 
 
@@ -116,8 +136,39 @@ def onMousePress(app, mouseX, mouseY):
             if app.player1.turn:
                 if app.scratch:
                     app.scratch = False
-    if app.button1.clicked(mouseX, mouseY):
-        print("clicked")
+    if app.menu:               
+        if app.playButton.clicked(mouseX, mouseY):
+            app.playButton.visible = False
+            app.instructionsButton.visible = False
+            app.optionsButton.visible = False
+            app.backButton.visible = True
+            app.chooseMode = True
+            app.instructions = False
+            app.options = False
+        elif app.instructionsButton.clicked(mouseX, mouseY):
+            app.playButton.visible = False
+            app.instructionsButton.visible = False
+            app.optionsButton.visible = False
+            app.backButton.visible = True
+            app.chooseMode = False
+            app.instructions = True
+            app.options = False
+        elif app.optionsButton.clicked(mouseX, mouseY):
+            app.playButton.visible = False
+            app.instructionsButton.visible = False
+            app.optionsButton.visible = False
+            app.backButton.visible = True
+            app.chooseMode = False
+            app.instructions = False
+            app.options = True
+        elif app.backButton.clicked(mouseX, mouseY):
+            app.playButton.visible = True
+            app.instructionsButton.visible = True
+            app.optionsButton.visible = True
+            app.backButton.visible = False
+            app.chooseMode = False
+            app.instructions = False
+            app.options = False
 
 def onKeyPress(app, key):
     if not app.gameOver:
