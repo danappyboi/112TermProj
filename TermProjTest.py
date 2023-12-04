@@ -77,11 +77,11 @@ def redrawAll(app):
     if app.gameOver == True:
         drawLabel("GAME OVER", app.width/2, app.height/2, size=60, font="orbitron", bold = True,fill='red')
 
-    app.button1.drawButtonGraphic("Did it work?")
+    # app.button1.drawButtonGraphic("Did it work?")
 
 
 
-def testing(app, ball, pocket):
+def testing(ball, pocket):
     """a function for anything being tested"""
     dxBTP = ball.posX - pyToCartX(pocket[0])
     dyBTP = ball.posY - pyToCartY(pocket[1])
@@ -163,7 +163,7 @@ def onStep(app):
                 app.cueBall.pocketed = False
                 if app.cueBall not in app.ballList:
                     app.ballList.append(app.cueBall)
-                app.cueBall.posX, app.cueBall.posY, targetBall, targetPocket = ai.scratch(app, app.cueBall, app.ballList, app.pockets, app.AIPlayer.striped)
+                app.cueBall.posX, app.cueBall.posY, targetBall, targetPocket = ai.scratch(app.cueBall, app.ballList, app.pockets, app.AIPlayer.striped)
                 app.cueStick.setPower(ai.determineBestPower(app.cueBall, targetBall, targetPocket))
                 app.cueStick.setAngle(ai.determineBestAngle(targetBall, targetPocket, app.cueBall))
                 app.cueStick.hitCueBall(app.cueBall)

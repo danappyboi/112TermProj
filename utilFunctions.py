@@ -1,4 +1,6 @@
 import math
+import os, pathlib
+from cmu_graphics import*
 
 def distance(x0, y0, x1, y1):
     return ((x1 - x0)**2 + (y1 - y0)**2)**0.5
@@ -44,3 +46,12 @@ def sign(n):
         return 0
     else:
         return int(n/abs(n))
+
+#Gotz it from piazza
+def loadSound(relativePath):
+    # Convert to absolute path (because pathlib.Path only takes absolute paths)
+    absolutePath = os.path.abspath(relativePath)
+    # Get local file URL
+    url = pathlib.Path(absolutePath).as_uri()
+    # Load Sound file from local URL
+    return Sound(url)

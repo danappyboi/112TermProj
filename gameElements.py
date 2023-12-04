@@ -9,6 +9,8 @@ height = 600
 tableWidth = 225
 tableHeight = 450
 
+clackSound = loadSound("clackSound.mp3")
+
 
 #peep this https://www.vobarian.com/collisions/2dcollisions2.pdf 
 def setVeloAfterCollision(ball1, ball2):
@@ -75,6 +77,7 @@ def checkBallCollisions(app, ballList):
                 
 
                 setVeloAfterCollision(ball1, ball2)
+                clackSound.play(restart=True)
 
 def drawPowerBar(x, y, power):
     """Draws the power bar at the bottom of the screen."""
