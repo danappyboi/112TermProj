@@ -84,7 +84,7 @@ def drawPowerBar(x, y, power):
     barWidth = 200
     barHeight = 30
     drawRect(x, y, barWidth, barHeight, border="white", align="center")
-    drawLine(x - barWidth/2 +2, y, x-barWidth/2 + barWidth *(power/100), y, fill="red", lineWidth=barHeight-5, dashes=True)
+    drawLine(x - barWidth/2 +2, y, x-barWidth/2 + barWidth *(power/30), y, fill="red", lineWidth=barHeight-5, dashes=True)
 
 def checkingPockets(ballList, pocketList, stripedList, nonStripedList):
     """Checks if any balls have been pocketed and places them in the correct player's pocketed list."""

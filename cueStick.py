@@ -12,7 +12,7 @@ class cueStickObj:
     
     def addPower(self, newDist):
         """Adds power to the stick, and through gameElements, the power bar."""
-        max = 100
+        max = 30
         min = 1
         tot = self.distFromBall + newDist
         if min <= tot <= max:
