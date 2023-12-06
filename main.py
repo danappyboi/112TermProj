@@ -49,13 +49,13 @@ def redrawAll(app):
                 ball.drawStatic(cartToPyX(ball.posX), cartToPyY(ball.posY))
 
         #drawing cueStick
-        if app.playing and not app.scratch and app.player1.turn:
+        if app.playing and not app.scratch and (app.firstPlayer.turn or (app.secondPlayer.turn and not app.secondPlayer.AI)):
             app.cueStick.posX = cartToPyX(app.cueBall.posX)
             app.cueStick.posY = cartToPyY(app.cueBall.posY)
             app.cueStick.draw()
         
         gameElements.drawPowerBar(app.width/2, app.height - 35, app.cueStick.distFromBall)
-        gameElements.drawPlayerHuds(app.player1, app.AIPlayer)
+        gameElements.drawPlayerHuds(app.firstPlayer, app.secondPlayer)
 
         #TODO: Make the winner more obvious
         if app.gameOver and not app.menu:
@@ -65,7 +65,7 @@ def redrawAll(app):
     app.instructionsButton.drawButtonGraphic("Instructions")
     app.optionsButton.drawButtonGraphic("Options")
     app.backButton.drawButtonGraphic("←")
-    app.twoPlayerButton.drawButtonGraphic("Two Player", opacity=30)
+    app.twoPlayerButton.drawButtonGraphic("Two Player")
     app.AIButton.drawButtonGraphic("AI Mode")
     app.pauseButton.drawButtonGraphic("II")
     app.backToMenu.drawButtonGraphic("To Menu")
@@ -81,7 +81,7 @@ def onMouseMove(app, mouseX, mouseY):
             button.highlight = False
     if not app.menu:
         if not app.gameOver:
-            if app.player1.turn == True:
+            if app.firstPlayer.turn or (app.secondPlayer.turn and not app.secondPlayer.AI):
                 if app.scratch:
                     app.cueBall.setVelo((0,0))
                     app.cueBall.pocketed = False
@@ -118,7 +118,7 @@ def onMousePress(app, mouseX, mouseY):
 
         if not (app.gameOver or app.paused):
             if app.playing:    
-                if app.player1.turn:
+                if app.firstPlayer.turn or (app.secondPlayer.turn and not app.secondPlayer.AI):
                     if app.scratch:
                         app.scratch = False
 
@@ -129,7 +129,7 @@ def onKeyPress(app, key):
             app.backToMenu.visible = not app.backToMenu.visible
         if not (app.gameOver or app.paused):
             if app.playing == True:
-                if app.player1.turn:
+                if app.firstPlayer.turn or (app.secondPlayer.turn and not app.secondPlayer.AI):
                     if key == "s" or key == "down":
                         app.cueStick.addPower(-1)
                     if key == "w" or key == "up":
@@ -142,7 +142,7 @@ def onKeyPress(app, key):
 def onKeyHold(app, keys):
     if not app.menu:
         if not (app.gameOver or app.paused):    
-            if app.player1.turn:
+            if app.firstPlayer.turn or (app.secondPlayer.turn and not app.secondPlayer.AI):
                 if "left" in keys or "a" in keys:
                     app.cueStick.addPower(-3)
                 if "right" in keys or "d" in keys:
@@ -151,19 +151,19 @@ def onKeyHold(app, keys):
 def onStep(app):
     if not app.menu:
         if not (app.gameOver or app.paused):
-            if app.playing and app.AIPlayer.turn:
+            if app.playing and (app.secondPlayer.turn and app.secondPlayer.AI):
                 if app.scratch:
                     app.cueBall.setVelo((0,0))
                     app.cueBall.pocketed = False
                     if app.cueBall not in app.ballList:
                         app.ballList.append(app.cueBall)
-                    app.cueBall.posX, app.cueBall.posY, targetBall, targetPocket = ai.scratch(app.cueBall, app.ballList, app.pockets, app.AIPlayer.striped)
+                    app.cueBall.posX, app.cueBall.posY, targetBall, targetPocket = ai.scratch(app.cueBall, app.ballList, app.pockets, app.secondPlayer.striped)
                     app.cueStick.setPower(ai.determineBestPower(app.cueBall, targetBall, targetPocket))
                     app.cueStick.setAngle(ai.determineBestAngle(targetBall, targetPocket, app.cueBall))
                     app.cueStick.hitCueBall(app.cueBall)
                     app.scratch = False
                 else:
-                    ai.hitTheBall(app.cueStick, app.cueBall, app.ballList, app.pockets, app.AIPlayer.striped)
+                    ai.hitTheBall(app.cueStick, app.cueBall, app.ballList, app.pockets, app.secondPlayer.striped)
                 app.playing = False
 
             if not app.playing:
@@ -185,10 +185,10 @@ def onStep(app):
                     
                 if gameElements.ballsStopped(app.ballList):
                     gameElements.checkWin(app, app.ball8, app.playerList)
-                    if app.player1.turn: 
-                        gameElements.turnLogic(app, app.player1, app.AIPlayer, app.stripedBalls, app.nonStripedBalls, app.ball8, app.cueBall, app.ballTouched)
+                    if app.firstPlayer.turn: 
+                        gameElements.turnLogic(app, app.firstPlayer, app.secondPlayer, app.stripedBalls, app.nonStripedBalls, app.ball8, app.cueBall, app.ballTouched)
                     else:
-                        gameElements.turnLogic(app, app.AIPlayer, app.player1, app.stripedBalls, app.nonStripedBalls, app.ball8, app.cueBall, app.ballTouched)
+                        gameElements.turnLogic(app, app.secondPlayer, app.firstPlayer, app.stripedBalls, app.nonStripedBalls, app.ball8, app.cueBall, app.ballTouched)
                     app.playing = True  
                     app.ballTouched = False
 

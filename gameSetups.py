@@ -9,11 +9,10 @@ def aiSetup():
     app.ballList = copy.copy(app.initalBallList)
     app.angle = 180
     app.cueStick = cueStickObj(app.cueBall.posX, app.cueBall.posY, app.angle)
-    app.player1 = player("Player 1")
-    app.AIPlayer = player("AI")
-    app.player1.turn = True
-
-    
+    app.firstPlayer = player("Player 1")
+    app.secondPlayer = player("AI")
+    app.secondPlayer.AI = True
+    app.firstPlayer.turn = True
 
     app.playing = True
     app.firstBallPocketed = False
@@ -21,10 +20,28 @@ def aiSetup():
     app.scratch = False
     app.gameOver = False
     
-    app.playerList = [app.player1, app.AIPlayer] #TODO: kinda don't like this implementation
+    app.playerList = [app.firstPlayer, app.secondPlayer] #TODO: kinda don't like this implementation
     app.nonStripedBalls = []
     app.stripedBalls = []
 
+def twoPlayerSetup():
+    officialBallSetup()
+    app.ballList = copy.copy(app.initalBallList)
+    app.angle = 180
+    app.cueStick = cueStickObj(app.cueBall.posX, app.cueBall.posY, app.angle)
+    app.firstPlayer = player("Player 1")
+    app.secondPlayer = player("Player 2")
+    app.firstPlayer.turn = True
+
+    app.playing = True
+    app.firstBallPocketed = False
+    app.ballTouched = False
+    app.scratch = False
+    app.gameOver = False
+    
+    app.playerList = [app.firstPlayer, app.secondPlayer] #TODO: kinda don't like this implementation
+    app.nonStripedBalls = []
+    app.stripedBalls = []
 
 def officialBallSetup():
     ballD = 20

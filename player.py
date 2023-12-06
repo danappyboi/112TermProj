@@ -12,3 +12,4 @@ class player:
         self.pocketed = []
         self.striped = None
         self.turn = False
+        self.AI = False

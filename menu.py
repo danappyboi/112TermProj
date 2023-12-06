@@ -51,7 +51,13 @@ def logic(app, mouseX, mouseY):
         app.chooseMode = False
         app.backButton.visible = False
         app.pauseButton.visible = True
-        gameSetups.aiSetup()        
+        gameSetups.aiSetup()   
+    if app.twoPlayerButton.clicked(mouseX, mouseY):
+        app.menu = False
+        app.chooseMode = False
+        app.backButton.visible = False
+        app.pauseButton.visible = True
+        gameSetups.twoPlayerSetup()        
     if app.instructionsButton.clicked(mouseX, mouseY):
         app.playButton.visible = False
         app.instructionsButton.visible = False
