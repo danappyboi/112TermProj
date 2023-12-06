@@ -95,6 +95,7 @@ def determineBestBall(cueBall, ballList, pocketList, striped):
 def only8BallLeft(ballList, striped):
     for ball in ballList:
         if ball.legal(striped):
+            print("nope")
             return False
     for i in range(len(ballList)):
         if ballList[i].ball8:
