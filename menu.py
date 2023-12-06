@@ -10,7 +10,8 @@ def draw(app, chooseMode, instructions, options):
         app.twoPlayerButton.visible = False
         app.AIButton.visible = False
     if instructions:
-        drawRect(app.width/2, app.height/2, 350, 500, align="center", fill=rgb(50,50,50), opacity=90)
+        drawImage("images\instructionPic.png", app.width/2, app.height/2, align="center")
+        # drawRect(app.width/2, app.height/2, 350, 500, align="center", fill=rgb(50,50,50), opacity=90)
     if options:
         drawRect(app.width/2, app.height/2, 350, 500, align="center", fill=rgb(50,50,50), opacity=90)
 

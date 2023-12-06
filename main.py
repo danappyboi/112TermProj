@@ -15,7 +15,7 @@ import menu
 #TODO: resize...?
 
 def onAppStart(app):
-    app.background = rgb(20, 30, 20)
+    app.background = rgb(30, 30, 30)
     app.width = 600
     app.height = 600
     app.tableWidth = 225
@@ -37,7 +37,6 @@ def redrawAll(app):
     drawRect(app.width/2, app.height/2, app.tableWidth, app.tableHeight, fill="steelBlue", align="center")
     for i in range(int(len(app.pockets))):
         drawCircle(app.pockets[i][0], app.pockets[i][1], 12, fill="black")
-        drawLabel(i,app.pockets[i][0], app.pockets[i][1], size=15,fill="white")
 
     if not app.menu:
         # drawing the ball
@@ -52,7 +51,10 @@ def redrawAll(app):
         if app.playing and not app.scratch and (app.firstPlayer.turn or (app.secondPlayer.turn and not app.secondPlayer.AI)):
             app.cueStick.posX = cartToPyX(app.cueBall.posX)
             app.cueStick.posY = cartToPyY(app.cueBall.posY)
-            app.cueStick.draw()
+            color = "brown"
+            if app.secondPlayer.turn:
+                color="navy"
+            app.cueStick.draw(color=color)
         
         gameElements.drawPowerBar(app.width/2, app.height - 35, app.cueStick.distFromBall)
         gameElements.drawPlayerHuds(app.firstPlayer, app.secondPlayer)

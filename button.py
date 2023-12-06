@@ -26,7 +26,7 @@ class button:
             else:
                 borderThickness = 2
             drawRect(self.x, self.y, self.width, self.height, align="center", border="white", borderWidth=borderThickness, fill=color,opacity=opacity)
-            drawLabel(text, self.x, self.y, size=self.height*.3, fill="white", font="orbitron")
+            drawLabel(text, self.x, self.y, size=self.height*.3, fill="white", font="Orbitron")
 
     def clicked(self, mouseX, mouseY):
         if self.visible:
