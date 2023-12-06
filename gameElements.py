@@ -9,6 +9,8 @@ height = 600
 tableWidth = 225
 tableHeight = 450
 
+clackSound = loadSound("clackSound.mp3")
+
 
 #peep this https://www.vobarian.com/collisions/2dcollisions2.pdf 
 def setVeloAfterCollision(ball1, ball2):
@@ -75,13 +77,14 @@ def checkBallCollisions(app, ballList):
                 
 
                 setVeloAfterCollision(ball1, ball2)
+                clackSound.play(restart=True)
 
 def drawPowerBar(x, y, power):
     """Draws the power bar at the bottom of the screen."""
     barWidth = 200
     barHeight = 30
     drawRect(x, y, barWidth, barHeight, border="white", align="center")
-    drawLine(x - barWidth/2 +2, y, x-barWidth/2 + barWidth *(power/100), y, fill="red", lineWidth=barHeight-5, dashes=True)
+    drawLine(x - barWidth/2 +2, y, x-barWidth/2 + barWidth *(power/30), y, fill="red", lineWidth=barHeight-5, dashes=True)
 
 def checkingPockets(ballList, pocketList, stripedList, nonStripedList):
     """Checks if any balls have been pocketed and places them in the correct player's pocketed list."""

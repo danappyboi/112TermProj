@@ -41,6 +41,9 @@ def determineBestBall(cueBall, ballList, pocketList, striped):
                         if possibleAngle(ball, cueBall, angle):
                             bestShots.append((ball, pocket, angle, determineBestPower(cueBall, ball, pocket)))
 
+    #TODO: Add case when 8ball is only ball left but there's no good shots for it
+    #TODO: for whatever reason, it still aims for 8 ball even when there is another ball it needs to shoot
+    #TODO: WHY IS THE 8 BALL A VALID SHOT????
     if bestShots == []:
         if only8BallLeft(ballList, striped) != False:
             ball8 = only8BallLeft(ballList, striped)
@@ -92,6 +95,7 @@ def determineBestBall(cueBall, ballList, pocketList, striped):
 def only8BallLeft(ballList, striped):
     for ball in ballList:
         if ball.legal(striped):
+            print("nope")
             return False
     for i in range(len(ballList)):
         if ballList[i].ball8:

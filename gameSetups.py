@@ -1,5 +1,30 @@
 from cmu_graphics import*
 from ballObj import ball
+from cueStick import cueStickObj
+from player import player
+import copy
+
+def aiSetup():
+    officialBallSetup()
+    app.ballList = copy.copy(app.initalBallList)
+    app.angle = 180
+    app.cueStick = cueStickObj(app.cueBall.posX, app.cueBall.posY, app.angle)
+    app.player1 = player("Player 1")
+    app.AIPlayer = player("AI")
+    app.player1.turn = True
+
+    
+
+    app.playing = True
+    app.firstBallPocketed = False
+    app.ballTouched = False
+    app.scratch = False
+    app.gameOver = False
+    
+    app.playerList = [app.player1, app.AIPlayer] #TODO: kinda don't like this implementation
+    app.nonStripedBalls = []
+    app.stripedBalls = []
+
 
 def officialBallSetup():
     ballD = 20
@@ -19,8 +44,8 @@ def officialBallSetup():
     app.yellowStriped = ball(ballD * .5, 200 - ballD * 3, 'images/yellowStriped9.png', striped=True)
     
 
-    app.ball8 = ball(0, 200 - ballD * 2, "images/8Ball.png", ball8=True)
-    app.cueBall = ball(0, -100, "images/cueBall.png", cueBall = True)
+    app.ball8 = ball(0, 200 - ballD * 2, "images/8Ball.png", striped=None, ball8=True)
+    app.cueBall = ball(0, -100, "images/cueBall.png",striped=None, cueBall = True)
 
     app.initalBallList = [app.cueBall, app.ball8, app.blue, app.blueStriped, app.green, 
                     app.greenStriped, app.lightOrange, app.lightOrangeStriped, app.orange, 
